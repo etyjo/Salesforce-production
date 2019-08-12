@@ -1,0 +1,24 @@
+<apex:page standardController="Location__c">
+    <link rel="stylesheet" href="{!URLFOR($Resource.Bootstrap3, '/bootstrap3/css/bootstrap.css')}"/>
+    
+    <apex:includeScript value="{!$Resource.jQUERY_lib}"/>
+    <apex:includeScript value="{!URLFOR($Resource.Bootstrap3, '/bootstrap3/js/jquery.min.js')}"/> 
+    <apex:includeScript value="{!URLFOR($Resource.bootsstrap_box, '/bootbox/bootstrap.js')}"/> 
+    <apex:includeScript value="{!URLFOR($Resource.bootsstrap_box, '/bootbox/bootbox.min.js')}"/> 
+
+    <script>
+            
+          if("{!Location__c.Location__Latitude__s}"!="" && "{!Location__c.Location__Longitude__s}"!=""){
+              var lat1="{!Location__c.Location__Latitude__s}";
+              var lng1="{!Location__c.Location__Longitude__s}";
+              sforce.one.navigateToURL("http://maps.google.com/?saddr=My+Location&daddr="+parseFloat(lat1)+","+parseFloat(lng1)+"&directionsmode=transit");
+          }
+          else
+          {
+                  bootbox.alert("Please Update GeoLocation",function(){
+                                                           sforce.one.back(true);
+                                                           }
+                          );
+          }          
+    </script>
+</apex:page>

@@ -1,0 +1,115 @@
+<apex:page standardController="Market__c" extensions="MarketAssignmentController" showHeader="false">
+
+    <apex:sectionHeader Title="Select Accounts" subtitle="{!Market__c.Name}"/>
+    <apex:messages style="color:red"/>
+    <style>
+        .search{
+            font-size:14pt;
+            margin-right: 20px;
+        }
+        .fyi{
+            color:red;
+            font-style:italic;
+        }
+        .label{
+            margin-right:10px;
+            font-weight:bold;
+        }
+    </style>
+
+    <script type='text/javascript'>
+    
+        // This script assists the search bar functionality
+        // It will execute a search only after the user has stopped typing for more than 1 second
+        // To raise the time between when the user stops typing and the search, edit the following variable:
+        
+        var waitTime = 1;
+        var countDown = waitTime+1;
+        var started = false;
+        
+        function resetTimer(){
+            countDown=waitTime+1;
+            if(started==false){
+                started=true;
+                runCountDown();
+            }
+        }
+        function runCountDown(){
+            countDown--;
+            
+            if(countDown<=0){
+                fetchResults();
+                started=false;
+            }
+            else{
+                window.setTimeout(runCountDown,500);
+            }
+        }
+    </script>
+    <apex:form >
+        <apex:outputPanel id="mainBody">
+            <br/>
+            <!-- if MultiCurrency used
+            <apex:outputPanel >
+                <apex:outputLabel styleClass="label">Currency: </apex:outputLabel>
+                <apex:outputText style="font-size:20px;font-weight:bold;color:red" value="{!chosenCurrency}"/>
+                <br/>
+            </apex:outputPanel>
+            <br/>-->
+            <apex:pageMessage severity="INFO" strength="1" summary="This view is to select Accounts" />
+            <apex:pageMessages id="pageMessage"/>
+            <!-- this is the upper table... a.k.a. the "Shopping Cart"-->
+            <apex:pageBlock title="Selected Accounts" id="selected">
+                <apex:pageblockTable value="{!shoppingCart}" var="s">
+                    <apex:column headerValue="Account Name" value="{!s.Name}"/>
+                    <apex:column >
+                        <apex:commandButton value="Remove" action="{!removeFromShoppingCart}" reRender="selected,searchResults" immediate="true">
+                            <!-- this param is how we send an argument to the controller, so it knows which row we clicked 'remove' on -->
+                            <apex:param value="{!s.Id}" assignTo="{!toUnselect}" name="toUnselect"/>
+                        </apex:commandButton>
+                    </apex:column>
+                </apex:pageblockTable>
+                <apex:pageBlockButtons >
+                    <apex:commandButton action="{!onSave}" value="Save"/>
+                    <apex:commandButton action="{!onCancel}" value="Cancel" immediate="true"/>
+                </apex:pageBlockButtons>
+            </apex:pageBlock>
+            <!-- this is the lower table: search bar and search results -->
+            <apex:pageBlock >
+                <apex:outputPanel styleClass="search">
+                    Search for Accounts:
+                </apex:outputPanel>
+                <apex:actionRegion renderRegionOnly="false" immediate="true">
+                    <apex:actionFunction name="fetchResults" action="{!updateAvailableList}" reRender="searchResults" status="searchStatus"/>
+                    <!-- here we invoke the scripting to get out fancy 'no button' search bar to work -->
+                    <apex:inputText value="{!searchString}" onkeydown="if(event.keyCode==13){this.blur();}else{resetTimer();}" style="width:300px"/>
+                    &nbsp;&nbsp;
+                    <i>
+                        <!-- actionStatus component makes it easy to let the user know when a search is underway -->
+                        <apex:actionStatus id="searchStatus" startText="searching..." stopText=" "/>
+                    </i>
+                </apex:actionRegion>
+                <br/>
+                <br/>
+                <apex:outputPanel id="searchResults">
+                    <apex:pageBlockTable value="{!AvailableAccounts}" var="a">
+                        <apex:column headerValue="Name" value="{!a.Name}" />
+                        <apex:column >
+                            <!-- command button in a column... neato -->
+                            <apex:commandButton value="Select" action="{!addToShoppingCart}" reRender="selected,searchResults,pageMessage" immediate="true">
+                                <!-- again we use apex:param to be able to tell the controller which row we are working with -->
+                                <apex:param value="{!a.Id}" assignTo="{!toSelect}" name="toSelect"/>
+                            </apex:commandButton>
+                        </apex:column>
+                    </apex:pageBlockTable>
+                    <!-- We put up a warning if results exceed 100 rows -->
+                    <apex:outputPanel styleClass="fyi" rendered="{!overLimit}">
+                        <br/>
+                        Your search returned over 100 results, use a more specific search string if you do not see the desired {!$ObjectType.Product2.Label}.
+                        <br/>
+                    </apex:outputPanel>
+                </apex:outputPanel>
+            </apex:pageBlock>
+        </apex:outputPanel>
+    </apex:form>
+</apex:page>

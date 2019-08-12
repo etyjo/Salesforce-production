@@ -1,0 +1,34 @@
+<apex:page StandardController="Market__c" extensions="AccountGroupReportController" sidebar="false" >
+    <apex:form >
+        <div>
+            <span style="font-size:20px">Account Group Report for {!theMarket.Name}</span>
+            <span style="float:right"><apex:commandButton value="Back" action="{!RedirectToGroup}"/>  </span>
+            <span style="float:right"><apex:commandButton value="Export to Excel" action="{!ExportToExcel}"/>  </span>        
+        </div>
+         
+        <apex:pageBlock >        
+            <apex:pageblockTable value="{!listReportData}" var="RD">
+                <apex:column value="{!RD.Name}" headerValue="Account Name"/>
+                <apex:column value="{!RD.CustomerNumber }" headerValue="Account No"/>
+                <apex:column value="{!RD.CustomerDirectIndirect }" headerValue="Account Direct / Indirect"/>
+                <apex:column value="{!RD.AccountEmail }" headerValue="Account Email"/>
+                <apex:column value="{!RD.Phone}" headerValue="Phone"/>
+                <apex:column value="{!RD.Street }" headerValue="Street"/>
+                <apex:column value="{!RD.Zip}" headerValue="Zip"/>
+                <apex:column value="{!RD.City}" headerValue="City"/>
+                <apex:column value="{!RD.State}" headerValue="State"/>
+                <apex:column value="{!RD.Country}" headerValue="Country"/>
+                <apex:column value="{!RD.AccountClass}" headerValue="Account Class"/>    
+                <apex:column value="{!RD.ContactName}" headerValue="Contact Name"/>    
+                <apex:column value="{!RD.Role}" headerValue="Role"/>    
+                <apex:column value="{!RD.ContactPhone}" headerValue="Phone"/>    
+                <apex:column value="{!RD.ContactMobile}" headerValue="Mobile"/>    
+                <apex:column value="{!RD.ContactEmail}" headerValue="Email"/>    
+                <apex:column value="{!RD.DecisionMaker}" headerValue="Decision Maker"/>    
+                <apex:column value="{!RD.Department}" headerValue="Department"/>   
+                <apex:column value="{!RD.KOL}" headerValue="KOL"/>   
+                <apex:column value="{!RD.SphereOfInfluence}" headerValue="Sphere of Influence"/>        
+            </apex:pageblockTable>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

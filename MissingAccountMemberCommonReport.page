@@ -1,0 +1,44 @@
+<apex:page controller="MissingAccountMemberReportController" sidebar="false" readOnly="true">
+        <apex:form >
+        <div>
+            <span style="font-size:20px">Members Missing in Account Team or Account team (Crop Responsibility)</span>
+            <span style="float:right"><apex:commandButton value="Back" action="{!RedirectToHome}"/>  </span>
+            <span style="float:right"><apex:commandButton value="Export to Excel" action="{!ExportToExcel}"/>  </span>        
+        </div>
+       
+        <style>
+            #reporttable{
+                border-collapse: collapse;
+            }
+            .style1{
+                border: 1px solid black;
+            }
+            
+         </style>
+        
+        <table id="reporttable">
+        <tr>
+            <th class="style1">Account Owner Legal Entity</th>
+            <th class="style1">Account Owner</th>
+            <th class="style1">Account Name</th>
+            <th class="style1">Account Number</th>
+            <th class="style1">Account Team User Name</th>
+            <th class="style1">Account Team Last Modified Date</th>
+            <th class="style1">Account Team CR user name</th>
+            <th class="style1">Account Team CR last modified date</th>
+        </tr>
+        <apex:repeat value="{!listReportData}" var="RD">
+            <tr>
+            <td class="style1">{!RD.Account_Owner_Legal_Entity}</td>
+            <td class="style1">{!RD.Account_Owner}</td>
+            <td class="style1">{!RD.Account_Name}</td>
+            <td class="style1">{!RD.Account_Number }</td>
+            <td class="style1">{!RD.Account_Team_User_Name}</td>
+            <td class="style1">{!RD.Account_Team_Last_Modified_Date}</td>
+            <td class="style1">{!RD.Account_Team_CR_user_name}</td>
+            <td class="style1">{!RD.Account_Team_CR_last_modified_date}</td>
+            </tr>
+        </apex:repeat>
+        </table>
+   </apex:form>
+</apex:page>

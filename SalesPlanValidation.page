@@ -1,0 +1,29 @@
+<apex:page standardController="Sales_Plan__c" extensions="SalesPlanValidationController" action="{!validateUserOwner}">
+    
+    <apex:messages style="color:red;"/>
+    
+    <apex:outputPanel rendered="{!NOT(navigateToNew) && NOT(accountCheck)}" style="padding: 10px;">
+        Please click <a href="{!navigationReturnUrl}">link</a> navigate back to Account.
+    </apex:outputPanel>        
+
+    <apex:outputPanel rendered="{!navigateToNew}">
+        <script>
+            if( (typeof sforce != 'undefined') && sforce && (!!sforce.one) ) {
+                // Salesforce1 navigation
+                sforce.one.createRecord("Sales_Plan__c");
+                //sforce.one.navigateToURL("/001/e");
+            }else{    
+
+                if('{!accountCheck}' == 'false' && '{!nameOfObject}' == 'Account'){
+                    window.location = "{!URLFOR($Action.Sales_Plan__c.New, null,[retURL=$Request.retURL,CF00N2400000IrMAD=$Request.CF00N2400000IrMAD,CF00N2400000IrMAD_lkid=$Request.CF00N2400000IrMAD_lkid,CurrencyIsoCode=currencyCode,RecordType=recordtTypeId,ent=entId],true)}"; 
+                }else if('{!accountCheck}' == 'false' && '{!nameOfObject}' == 'AccountGroup'){
+                    window.location = "{!URLFOR($Action.Sales_Plan__c.New, null,[retURL=$Request.retURL,CF00N2400000IrMAJ=$Request.CF00N2400000IrMAJ,CF00N2400000IrMAJ_lkid=$Request.CF00N2400000IrMAJ_lkid,CurrencyIsoCode=currencyCode,RecordType=recordtTypeId,ent=entId],true)}"; 
+                }else if('{!accountCheck}' == 'true'){
+                    window.location = "{!URLFOR($Action.Sales_Plan__c.New, null,[retURL=$Request.retURL],true)}"; 
+                }
+            }
+        </script>
+    </apex:outputPanel>
+
+    
+</apex:page>

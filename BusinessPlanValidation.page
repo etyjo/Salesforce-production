@@ -1,0 +1,222 @@
+<apex:page standardController="Business_Plan__c" extensions="BusinessPlanValidationController" action="{!validateUserOwner}">       
+    <apex:messages style="color:red;"/>
+      
+        
+    <apex:outputPanel rendered="{!NOT(navigateToNew) && NOT(accountCheck) && NOT($User.UITheme == 'Theme4t') }" style="padding: 10px;">
+        <div id="idNavigationBack" style="display:none;">
+           Please click <a href="{!URLFOR(navigationReturnUrl)}">link</a> to navigate back.
+        </div>
+    </apex:outputPanel>
+     <link rel="stylesheet" href="{!URLFOR($Resource.Bootstrap3, '/bootstrap3/css/bootstrap.css')}"/>
+    
+
+    <script>
+      <!----- Bootstrap Script ----->
+                     <apex:includeScript value="{!$Resource.jQUERY_lib}"/>
+                     <apex:includeScript value="{!URLFOR($Resource.Bootstrap3, '/bootstrap3/js/bootstrap.min.js')}"/> 
+                     <apex:includeScript value="{!URLFOR($Resource.bootsstrap_box, '/bootbox/bootstrap.js')}"/> 
+                     <apex:includeScript value="{!URLFOR($Resource.bootsstrap_box, '/bootbox/bootbox.min.js')}"/> 
+                     
+   
+    </script>
+   
+    <script src="https://mobile1.t.salesforce.com/soap/ajax/30.0/connection.js" type="text/javascript" />    
+    <script>
+      var navigate = '{!navigateToNew}';
+      var account = '{!accountCheck}';
+      var theme ='{!$User.UITheme}';
+      //var error ='{!$Label.BusinessPlanMarketValidation}';
+      var Accountname ='{!acccountName}';
+      var Marketname = '{!marketName}';
+      <!--var MarketName = '{!BmarketName}';-->
+      
+      window.onload = function(){
+            if( (typeof sforce != 'undefined') && sforce && (!!sforce.one) ) {
+                document.getElementById("idNavigationBack").style = "display : none;";
+            }else{
+                document.getElementById("idNavigationBack").style = "display : block;";
+            }
+      }
+    
+    </script>
+   
+    <apex:outputPanel rendered="{!IF(navigateToNew=true && marketExist=false,true,false)}">
+        <script>
+            var ActiveM='{!hasActiveMarketBP}';
+            var ActiveMA='{!hasActiveAcctBP}';
+            var ActiveMA1='{!hasActiveMarBP}';
+            var ActiveSelf = '{!hasActiveSelfBP}';
+            
+            if( (typeof sforce != 'undefined') && sforce && (!!sforce.one) ) {
+                <!--Salesforce1 navigation-->
+             if('{!accountCheck}' == 'false' && '{!nameOfObject}' == 'Account'){
+               
+                    if(ActiveM=='true'){
+                    
+                      bootbox.confirm({ 
+                          message: "{!$Label.BPVALACCAG1}".replace('**ACCNAME**',Accountname), 
+                          callback: function(result){ if(result && ActiveSelf=='true') {
+                                                            sforce.one.createRecord("Business_Plan__c");
+                                                                 }
+                                                      else if(!result)
+                                                          { 
+                                                              sforce.one.back(true);
+                                                          }
+                                                       else if (result)
+                                                           sforce.one.createRecord("Business_Plan__c");
+                                                               }
+                            });
+                    }    
+                    else if(ActiveSelf=='false')
+                        sforce.one.createRecord("Business_Plan__c");  
+                        
+                    if(ActiveSelf == 'true'){
+                       
+                         bootbox.confirm({ 
+                          message: "{!$Label.BPVALACCSELF}".replace('**ACCNAME**',Accountname), 
+                          callback: function(result){ if(result && ActiveM=='false') {
+                                                         sforce.one.createRecord("Business_Plan__c");
+                                                      }
+                                                      
+                                                   }
+                            });
+             
+                    }
+                        
+                  
+             }
+             else if('{!accountCheck}' == 'false' && '{!nameOfObject}' == 'AccountGroup'){
+                
+                    if(ActiveMA=='true'){
+                        //fncask("WARNING","{!$Label.BPVALAGACC1}".replace('**AGNAME**',Marketname));
+                      bootbox.confirm({ 
+                          message: "{!$Label.BPVALAGACC1}".replace('**AGNAME**',Marketname), 
+                          callback: function(result){ if(result && ActiveSelf=='true') {
+                                                            sforce.one.createRecord("Business_Plan__c");
+                                                                 }
+                                                      else if(!result)
+                                                          { 
+                                                              sforce.one.back(true);
+                                                          }
+                                                       else if (result)
+                                                           sforce.one.createRecord("Business_Plan__c");
+                                                               }
+                            });
+                    
+                    }
+                    else if(ActiveMA1=='true'){
+                        //fncask("WARNING","{!$Label.BPVALAGOAG1}".replace('**AGNAME**',Marketname));
+                        bootbox.confirm({ 
+                          message: "{!$Label.BPVALAGOAG1}".replace('**AGNAME**',Marketname), 
+                          callback: function(result){ if(result && ActiveSelf=='true') {
+                                                            sforce.one.createRecord("Business_Plan__c");
+                                                                 }
+                                                      else if(!result)
+                                                          { 
+                                                              sforce.one.back(true);
+                                                          }
+                                                       else if (result)
+                                                           sforce.one.createRecord("Business_Plan__c");
+                                                               }
+                            });
+                    }    
+                    else if(ActiveSelf == 'false')
+                        sforce.one.createRecord("Business_Plan__c");
+                        
+                     if(ActiveSelf == 'true'){
+                        //fncask("WARNING","{!$Label.BPVALAGSELF}".replace('**AGNAME**',Marketname));
+                         bootbox.confirm({ 
+                          message: "{!$Label.BPVALAGSELF}".replace('**AGNAME**',Marketname), 
+                          callback: function(result){ if(result && (ActiveMA=='false'&& ActiveMA1=='false')) 
+                                                      {
+                                                         sforce.one.createRecord("Business_Plan__c");
+                                                      }
+                                                      
+                                                      
+                                                   }
+                            });
+             
+                     }
+             }
+            else if('{!accountCheck}' == 'true'){
+                 //fncShowMessage("warning","{!$Label.BPVALTABNEW}");
+                 bootbox.alert("{!$Label.BPVALTABNEW}",function(){sforce.one.back(true); });
+                          }
+   
+            }
+            else
+            {   
+                if('{!accountCheck}' == 'false' && '{!nameOfObject}' == 'Account'){
+                    
+                    if(ActiveSelf == 'true'){
+                        var r = confirm("{!$Label.BPVALACCSELF}".replace('**ACCNAME**',Accountname));
+                        
+                        if (r == true)
+                            window.location = "{!URLFOR($Action.Business_Plan__c.New, null,[retURL=$Request.retURL,CF00N2400000ILF3a=$Request.CF00N2400000ILF3a,CF00N2400000ILF3a_lkid=$Request.CF00N2400000ILF3a_lkid],true)}";
+                        else
+                            window.location ="{!navigationReturnUrl}"; 
+                    }
+                    if(ActiveM=='true'){                    
+                        var r = confirm("{!$Label.BPVALACCAG1}".replace('**ACCNAME**',Accountname));
+                        
+                        if (r == true)
+                            window.location = "{!URLFOR($Action.Business_Plan__c.New, null,[retURL=$Request.retURL,CF00N2400000ILF3a=$Request.CF00N2400000ILF3a,CF00N2400000ILF3a_lkid=$Request.CF00N2400000ILF3a_lkid],true)}";
+                        else
+                            window.location ="{!navigationReturnUrl}"; 
+                    }
+                    else if(ActiveSelf=='false')
+                    {
+                        window.location = "{!URLFOR($Action.Business_Plan__c.New, null,[retURL=$Request.retURL,CF00N2400000ILF3a=$Request.CF00N2400000ILF3a,CF00N2400000ILF3a_lkid=$Request.CF00N2400000ILF3a_lkid],true)}";
+                    }
+                }
+                else if('{!accountCheck}' == 'false' && '{!nameOfObject}' == 'AccountGroup'){
+                    
+                    if(ActiveSelf == 'true'){
+                        var r = confirm("{!$Label.BPVALAGSELF}".replace('**AGNAME**',Marketname));
+                        
+                        if (r == true)
+                            window.location = "{!URLFOR($Action.Business_Plan__c.New, null,[retURL=$Request.retURL,CF00N2400000ILF3d=$Request.CF00N2400000ILF3d,CF00N2400000ILF3d_lkid=$Request.CF00N2400000ILF3d_lkid],true)}";
+                        else
+                            window.location ="{!navigationReturnUrl}"; 
+                    }
+                    
+                    if(ActiveMA=='true'){
+                        var s = confirm("{!$Label.BPVALAGACC1}".replace('**AGNAME**',Marketname));
+                        
+                        if (s == true) {
+                            window.location = "{!URLFOR($Action.Business_Plan__c.New, null,[retURL=$Request.retURL,CF00N2400000ILF3d=$Request.CF00N2400000ILF3d,CF00N2400000ILF3d_lkid=$Request.CF00N2400000ILF3d_lkid],true)}"; 
+                        }
+                        else{
+                            window.location ="{!navigationReturnUrl}"; 
+                        }
+                    }
+                    else if(ActiveMA1=='true'){
+                        var q = confirm("{!$Label.BPVALAGOAG1}".replace('**AGNAME**',Marketname));
+                        
+                        if (q == true) {
+                            window.location = "{!URLFOR($Action.Business_Plan__c.New, null,[retURL=$Request.retURL,CF00N2400000ILF3d=$Request.CF00N2400000ILF3d,CF00N2400000ILF3d_lkid=$Request.CF00N2400000ILF3d_lkid],true)}"; 
+                        }
+                        else{
+                            window.location ="{!navigationReturnUrl}"; 
+                        }
+                    }
+                    else if(ActiveSelf=='false')
+                    {
+                        window.location = "{!URLFOR($Action.Business_Plan__c.New, null,[retURL=$Request.retURL,CF00N2400000ILF3d=$Request.CF00N2400000ILF3d,CF00N2400000ILF3d_lkid=$Request.CF00N2400000ILF3d_lkid],true)}"; 
+                    }
+                }
+                else if('{!accountCheck}' == 'true')
+                {
+                    alert("{!$Label.BPVALTABNEW}");
+                    window.location ="{!navigationReturnUrl}"; 
+                }
+            }
+            
+            function fncRefreshPage()
+                    {
+                        sforce.one.back(true);   
+                    } 
+           
+        </script>
+    </apex:outputPanel>
+</apex:page>

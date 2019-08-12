@@ -1,0 +1,49 @@
+<apex:component controller="SortedLineItemsController" access="global">
+    <apex:attribute name="OppId" type="Id" description="Id of the Opportunity" assignTo="{!opportunityId}"/>
+    <table class="table969">
+      <tbody>
+        <tr>
+            <td class="table969header">Subkind</td>
+            <td class="table969header">Product</td>
+            <td class="table969header">SF/ST</td>
+            <td class="table969header">Seed Size</td>
+            <td class="table969header">Qty (Th/Kg)</td>
+            <td class="table969header">Package Size</td>
+            <td class="table969header">No. of Packages</td>
+            <td class="table969header">Package Layout</td>
+            <td class="table969header">Picture Label</td>
+            <td class="table969header">ERP Sales Price</td>
+            <td class="table969header">Sales Price UOM</td>
+            <td class="table969header">Operator</td>
+            <td class="table969header">Operator Value</td>
+            <td class="table969header">Monetary Value</td>
+            <td class="table969header">Actual Sales Price</td>
+            <td class="table969header">Net Sales Amount</td>
+            <td class="table969header" style="max-width: 60px;">Remarks</td>             
+        </tr>
+        <apex:repeat value="{!Sorted}" var="oli">
+        <tr>
+            <td class="table969footer" align="center"><apex:outputField value="{!oli.Subkind__c}"/></td>
+            <!--<td class="table969footer" align="center"><apex:outputField value="{!oli.Opportunity.Name}"/></td>
+            <td class="table969footer" align="center"><apex:outputField value="{!oli.Name}"/></td>-->
+            <td class="table969RowEven" align="center"><apex:outputField value="{!oli.PricebookEntry.Product2.name}"/></td>
+            <td class="table969RowOdd" align="center"><apex:outputField value="{!oli.SF_ST_Description__c}"/></td> 
+            <td class="table969RowEven" align="center"><apex:outputField value="{!oli.Seed_Size_Description__c}"/></td> 
+            <td class="table969RowEven" align="right"><apex:outputField value="{!oli.quantity}"/></td> 
+            <td class="table969RowEven" align="center"><apex:outputField value="{!oli.Package_Size__c}"/></td> 
+            <td class="table969RowEven" align="center"><apex:outputField value="{!oli.Number_of_Packages__c}"/></td>
+            <td class="table969RowEven" align="center"><apex:outputField value="{!oli.Package_Layout__c}"/></td> 
+            <td class="table969RowEven" align="center"><apex:outputField value="{!oli.Picture_Label__c}"/></td> 
+            <td class="table969RowEven" align="right"><apex:outputText value="{0,number}">{!oli.CurrencyIsoCode} &nbsp;<apex:param value="{!oli.unitprice}"/></apex:outputText></td>
+            <td class="table969RowEven" align="right"><apex:outputField value="{!oli.Sales_Price_UOM__c}"/></td> 
+            <td class="table969RowEven" align="right"><apex:outputField value="{!oli.Operator__c}"/></td> 
+            <td class="table969RowEven" align="center"><apex:outputField value="{!oli.Discount_Value__c}"/></td> 
+            <td class="table969RowEven" align="right"><apex:outputText value="{0,number}">{!oli.CurrencyIsoCode} &nbsp;<apex:param value="{!oli.Monetary_Discount__c}"/></apex:outputText></td> 
+            <td class="table969RowEven" align="right"><apex:outputText value="{0,number}">{!oli.CurrencyIsoCode} &nbsp;<apex:param value="{!oli.Actual_Sales_Price__c}"/></apex:outputText></td>
+            <td class="table969RowEven" align="right"><apex:outputText value="{0,number}">{!oli.CurrencyIsoCode} &nbsp;<apex:param value="{!oli.Sales_Amount__c}"/></apex:outputText></td> 
+            <td class="table969RowEven" align="center" style="max-width: 60px;"><apex:outputField value="{!oli.Remarks__c}"/></td>         
+        </tr>
+        </apex:repeat> 
+      </tbody>         
+    </table>
+</apex:component>

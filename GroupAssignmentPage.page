@@ -1,0 +1,631 @@
+<apex:page showHeader="false" standardStylesheets="false" standardController="Market__c" extensions="GroupAssignmentController">
+    <APex:pageMessages ></APex:pageMessages>
+    <html>
+        <head>
+            <!----- Bootstrap CSS ----->
+            <link rel="stylesheet" href="{!URLFOR($Resource.Bootstrap3, '/bootstrap3/css/bootstrap.css')}"/>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+
+            <!----- Scripts ---->
+            <script type="text/javascript">
+                <apex:includeScript value="{!URLFOR($Resource.Bootstrap3, '/bootstrap3/js/jquery-2.1.3.js')}"/>
+                <apex:includeScript value="{!URLFOR($Resource.Bootstrap3, '/bootstrap3/js/jquery.min.js')}"/> 
+            </script>
+            
+            <!----- Style ----->    
+            <style type="text/css">
+               body{
+                  margin-top:70px;                
+                }
+                #tblWrapper {
+                    height:300px;
+                    margin:10px;
+                    border-top: 1px solid #7cb4eb;  
+                    font-size:12px;    
+                }
+                .form-control{
+                    border-left: 7px solid #adabab;
+                }
+                
+                .table thead th {
+                    background-color: #e7e7e7;
+                }
+                .navbar{
+                    background-color: #428bca;
+                }
+                .navbar .navbar-brand,.navbar .navbar-text
+                {
+                    color:#ffffff;
+                }
+                .breadcrumb{
+                    background-color:#e7e7e7;
+                }  
+                .breadcrumb > li + li:before {
+                    content: "";
+                }  
+                .bs-example {
+                    margin: 20px;
+                }                        
+                <!----- Modal CSS -----> 
+                .modal-header-success {
+                    color:#fff;
+                    padding:9px 15px;
+                    border-bottom:1px solid #eee;
+                    background-color: #5cb85c;
+                    -webkit-border-top-left-radius: 5px;
+                    -webkit-border-top-right-radius: 5px;
+                    -moz-border-radius-topleft: 5px;
+                    -moz-border-radius-topright: 5px;
+                     border-top-left-radius: 5px;
+                     border-top-right-radius: 5px;
+                }
+                .modal-header-warning {
+                    color:#fff;
+                    padding:9px 15px;
+                    border-bottom:1px solid #eee;
+                    background-color: #f0ad4e;
+                    -webkit-border-top-left-radius: 5px;
+                    -webkit-border-top-right-radius: 5px;
+                    -moz-border-radius-topleft: 5px;
+                    -moz-border-radius-topright: 5px;
+                     border-top-left-radius: 5px;
+                     border-top-right-radius: 5px;
+                }
+                .modal-header-danger {
+                    color:#fff;
+                    padding:9px 15px;
+                    border-bottom:1px solid #eee;
+                    background-color: #d9534f;
+                    -webkit-border-top-left-radius: 5px;
+                    -webkit-border-top-right-radius: 5px;
+                    -moz-border-radius-topleft: 5px;
+                    -moz-border-radius-topright: 5px;
+                     border-top-left-radius: 5px;
+                     border-top-right-radius: 5px;
+                }
+                .modal-header-info {
+                    color:#fff;
+                    padding:9px 15px;
+                    border-bottom:1px solid #eee;
+                    background-color: #5bc0de;
+                    -webkit-border-top-left-radius: 5px;
+                    -webkit-border-top-right-radius: 5px;
+                    -moz-border-radius-topleft: 5px;
+                    -moz-border-radius-topright: 5px;
+                     border-top-left-radius: 5px;
+                     border-top-right-radius: 5px;
+                }
+                .modal-header-primary {
+                    color:#fff;
+                    padding:9px 15px;
+                    border-bottom:1px solid #eee;
+                    background-color: #428bca;
+                    -webkit-border-top-left-radius: 5px;
+                    -webkit-border-top-right-radius: 5px;
+                    -moz-border-radius-topleft: 5px;
+                    -moz-border-radius-topright: 5px;
+                     border-top-left-radius: 5px;
+                     border-top-right-radius: 5px;
+                }
+                
+                <!---------- Spinner ----->
+                
+                /* Absolute Center Spinner */
+                .loading {
+                    position: fixed;
+                    z-index: 999;
+                    height: 2em;
+                    width: 2em;
+                    overflow: show;
+                    margin: auto;
+                    top: 0;
+                    left: 0;
+                    bottom: 0;
+                    right: 0;
+                }
+                
+                /* Transparent Overlay */
+                    .loading:before {
+                    content: '';
+                    display: block;
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(0,0,0,0.3);
+                }
+                
+                /* :not(:required) hides these rules from IE9 and below */
+                .loading:not(:required) {
+                    /* hide "loading..." text */
+                    font: 0/0 a;
+                    color: transparent;
+                    text-shadow: none;
+                    background-color: transparent;
+                    border: 0;
+                }
+                
+                .loading:not(:required):after {
+                    content: '';
+                    display: block;
+                    font-size: 10px;
+                    width: 1em;
+                    height: 1em;
+                    margin-top: -0.5em;
+                    -webkit-animation: spinner 1500ms infinite linear;
+                    -moz-animation: spinner 1500ms infinite linear;
+                    -ms-animation: spinner 1500ms infinite linear;
+                    -o-animation: spinner 1500ms infinite linear;
+                    animation: spinner 1500ms infinite linear;
+                    border-radius: 0.5em;
+                    -webkit-box-shadow: rgba(0, 0, 0, 0.75) 1.5em 0 0 0, rgba(0, 0, 0, 0.75) 1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) 0 1.5em 0 0, rgba(0, 0, 0, 0.75) -1.1em 1.1em 0 0, rgba(0, 0, 0, 0.5) -1.5em 0 0 0, rgba(0, 0, 0, 0.5) -1.1em -1.1em 0 0, rgba(0, 0, 0, 0.75) 0 -1.5em 0 0, rgba(0, 0, 0, 0.75) 1.1em -1.1em 0 0;
+                    box-shadow: rgba(0, 0, 0, 0.75) 1.5em 0 0 0, rgba(0, 0, 0, 0.75) 1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) 0 1.5em 0 0, rgba(0, 0, 0, 0.75) -1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) -1.5em 0 0 0, rgba(0, 0, 0, 0.75) -1.1em -1.1em 0 0, rgba(0, 0, 0, 0.75) 0 -1.5em 0 0, rgba(0, 0, 0, 0.75) 1.1em -1.1em 0 0;
+                }
+                
+                /* Animation */
+                
+                @-webkit-keyframes spinner {
+                    0% {
+                        -webkit-transform: rotate(0deg);
+                        -moz-transform: rotate(0deg);
+                        -ms-transform: rotate(0deg);
+                        -o-transform: rotate(0deg);
+                        transform: rotate(0deg);
+                    }
+                    100% {
+                        -webkit-transform: rotate(360deg);
+                        -moz-transform: rotate(360deg);
+                        -ms-transform: rotate(360deg);
+                        -o-transform: rotate(360deg);
+                        transform: rotate(360deg);
+                    }
+                }
+                @-moz-keyframes spinner {
+                    0% {
+                        -webkit-transform: rotate(0deg);
+                        -moz-transform: rotate(0deg);
+                        -ms-transform: rotate(0deg);
+                        -o-transform: rotate(0deg);
+                        transform: rotate(0deg);
+                    }
+                    100% {
+                        -webkit-transform: rotate(360deg);
+                        -moz-transform: rotate(360deg);
+                        -ms-transform: rotate(360deg);
+                        -o-transform: rotate(360deg);
+                        transform: rotate(360deg);
+                    }
+                }
+                @-o-keyframes spinner {
+                    0% {
+                        -webkit-transform: rotate(0deg);
+                        -moz-transform: rotate(0deg);
+                        -ms-transform: rotate(0deg);
+                        -o-transform: rotate(0deg);
+                        transform: rotate(0deg);
+                    }
+                    100% {
+                        -webkit-transform: rotate(360deg);
+                        -moz-transform: rotate(360deg);
+                        -ms-transform: rotate(360deg);
+                        -o-transform: rotate(360deg);
+                        transform: rotate(360deg);
+                    }
+                }
+                @keyframes spinner {
+                    0% {
+                        -webkit-transform: rotate(0deg);
+                        -moz-transform: rotate(0deg);
+                        -ms-transform: rotate(0deg);
+                        -o-transform: rotate(0deg);
+                        transform: rotate(0deg);
+                    }
+                    100% {
+                        -webkit-transform: rotate(360deg);
+                        -moz-transform: rotate(360deg);
+                        -ms-transform: rotate(360deg);
+                        -o-transform: rotate(360deg);
+                        transform: rotate(360deg);
+                    }
+                }
+                <!------------------->
+                
+            </style>
+            
+            <!----- JS  ----->
+            
+            <script type='text/javascript'>
+    
+                // This script assists the search bar functionality
+                // It will execute a search only after the user has stopped typing for more than 1 second
+                // To raise the time between when the user stops typing and the search, edit the following variable:
+                
+                var waitTime = 1;
+                var countDown = waitTime+1;
+                var started = false;
+                
+                function resetTimer(){
+                    countDown=waitTime+1;
+                    if(started==false){
+                        started=true;
+                        runCountDown();
+                    }
+                }
+                function runCountDown(){
+                    countDown--;
+                    
+                    if(countDown<=0){
+                        fetchResults();
+                        started=false;
+                    }
+                    else{
+                        window.setTimeout(runCountDown,500);
+                    }
+                }
+            </script>
+            
+            <script type="text/javascript">
+            
+                $(document).ready(function() {
+                    $("#tblSelectedAccount").tableHeadFixer(); 
+                    $("#tblSelectAccount").tableHeadFixer(); 
+                });
+                
+                var ActiveGrpBP = {!cntOfGrpBP };
+                var ActiveGrpSP = {!cntOfGrpSP };
+                
+                //map for warning messages
+                var WarningMap= new Object(); // or var map = {};
+                WarningMap["ADDBPAG1A1OAG1"] = "{!$Label.ADDBPAG1A1OAG1}";
+                WarningMap["ADDBPAG1A1OAG0"] = "{!$Label.ADDBPAG1A1OAG0}";
+                WarningMap["ADDBPAG1A0OAG1"] = "{!$Label.ADDBPAG1A0OAG1}";
+                WarningMap["ADDBPAG1A0OAG0"] = "{!$Label.ADDBPAG1A0OAG0}";
+                WarningMap["ADDBPAG0A1OAG1"] = "{!$Label.ADDBPAG0A1OAG1}";
+                WarningMap["ADDBPAG0A1OAG0"] = "{!$Label.ADDBPAG0A1OAG0}";
+                WarningMap["ADDBPAG0A0OAG1"] = "{!$Label.ADDBPAG0A0OAG1}";
+                WarningMap["ADDBPAG0A0OAG0"] = "{!$Label.ADDBPAG0A0OAG0}";
+                WarningMap["REMBPAG1A0OAG0"] = "{!$Label.REMBPAG1A0OAG0}";
+                WarningMap["REMAGNOUSRACCS"] = "{!$Label.REMAGNOUSRACCS}";
+                WarningMap["REMSPAG1A0OAG0"] = "{!$Label.REMSPAG1A0OAG0}";                
+                
+                function setTableCSS(){
+                    $("#tblSelectedAccount").tableHeadFixer(); 
+                    $("#tblSelectAccount").tableHeadFixer(); 
+                }
+                <!----- For Modal Alert ----->
+                function ShowAlert(Action,Title,WarningLabel,chkElement,AccID){
+                    
+                    switch(Title)
+                    {
+                        case "Error" :
+                            $("#ModalHeader").attr('class', 'modal-header modal-header-danger');
+                            $('#btnModal1').hide();
+                            $("#btnModal2").html('Close');
+                            $('#btnModal2').unbind('click');
+                            //$("#btnModal2").click(function(){fncUncheckCheckbox(chkElement);});
+                            $("#btnModal2").show();
+                            $("#ModalTitle").text(Title);                        
+                            $("#ModalBody").text(WarningLabel);   
+                            $("#myModal").modal({backdrop: 'static'});
+                            break;
+                        
+                        case "Alert" :
+                            $("#ModalHeader").attr('class', 'modal-header modal-header-danger');
+                            $('#btnModal1').hide();
+                            $("#btnModal2").html('Close');
+                            $('#btnModal2').unbind('click');
+                            $("#btnModal2").click(function(){fncUncheckCheckbox(chkElement);});
+                            $("#btnModal2").show();
+                            
+                            $("#ModalTitle").text(Title);                        
+                            $("#ModalBody").text(WarningMap[WarningLabel]);   
+                            $("#myModal").modal({backdrop: 'static'});
+                            break;
+                        case "Confirmation" :
+                            $("#ModalHeader").attr('class', 'modal-header modal-header-warning');
+                            $("#btnModal1").html('OK');                            
+                            $('#btnModal1').show();
+                            $('#btnModal1').unbind('click');
+                            if (Action == 'Remove'){
+                                
+                                $("#btnModal1").click(function(){
+                                    fncConfirmSalesPlanAction(chkElement,AccID);
+                                });
+                            }                            
+                            $("#btnModal2").html('CANCEL');
+                            $('#btnModal2').unbind('click');
+                            $("#btnModal2").click(function(){fncUncheckCheckbox(chkElement);});
+                            $('#btnModal2').show();
+                            
+                            $("#ModalTitle").text("Warning");                        
+                            $("#ModalBody").text(WarningMap[WarningLabel]);   
+                            $("#myModal").modal({backdrop: 'static'});
+                            break;
+                       case "Multi-Action Confirmation" :
+                            $("#btnModalMAC1").html('Remove sales objective lines from this account');
+                            $('#btnModalMAC1').unbind('click');
+                            $("#btnModalMAC1").click(function(){fncAddAccIDToBeDelinkedorDeleted('Delete', AccID);});
+                            
+                            $("#btnModalMAC2").html('Keep sales objective lines on this account');
+                            $('#btnModalMAC2').unbind('click');
+                            $("#btnModalMAC2").click(function(){fncAddAccIDToBeDelinkedorDeleted('Delink', AccID);});
+                            
+                            $("#btnModalMAC3").html('CANCEL');
+                            $('#btnModalMAC3').unbind('click');
+                            $("#btnModalMAC3").click(function(){fncUncheckCheckbox(chkElement);});
+                            
+                            $("#ModalMACTitle").text("Warning");                        
+                            $("#ModalMACBody").text(WarningMap[WarningLabel]);   
+                            $("#ModalMAC").modal({backdrop: 'static'});
+                            break;
+                        case "Success" :
+                            $("#ModalHeader").attr('class', 'modal-header modal-header-success');
+                            
+                            $("#ModalTitle").text(Title);                        
+                            $("#ModalBody").text(WarningMap[WarningLabel]);   
+                            $("#myModal").modal({backdrop: 'static'});
+                            break;
+                        default:
+                            $("#ModalHeader").attr('class', 'modal-header modal-header-info');
+                            
+                            $("#ModalTitle").text(Title);                        
+                            $("#ModalBody").text(WarningMap[WarningLabel]);   
+                            $("#myModal").modal({backdrop: 'static'});
+                            break;
+                    }
+                    
+                }
+                
+                <!----- To Validate Add Account to Account Group ------>
+                function fncValidateAddition(chkElement,AccID,hasBP,hasBPInOtherGrp){
+                    if(chkElement.checked){
+                        if(ActiveGrpBP > 0){
+                            if(hasBP) // Case 1 -- ADDBPAG1A1OAG1,ADDBPAG1A1OAG0
+                                ShowAlert("Add","Confirmation","ADDBPAG1A1OAG1",chkElement,AccID);
+                            else if(hasBPInOtherGrp) //Case 2 -- ADDBPAG1A0OAG1
+                                ShowAlert("Add","Confirmation","ADDBPAG1A0OAG1",chkElement,AccID);
+                            else //Case 3 -- ADDBPAG1A0OAG0
+                                ShowAlert("Add","Confirmation","ADDBPAG1A0OAG0",chkElement,AccID);
+                        }
+                        /*
+                        else if(hasBP){ //Case 4 -- ADDBPAG0A1OAG1,ADDBPAG0A1OAG0
+                            ShowAlert("Add","Confirmation","ADDBPAG0A1OAG1",chkElement,AccID);
+                        }
+                        else if(hasBPInOtherGrp){ // Case 5 -- ADDBPAG0A0OAG1
+                            ShowAlert("Add","Confirmation","ADDBPAG0A0OAG1",chkElement,AccID);
+                        }
+                        */
+                        // Case 6 -- ADDBPAG0A0OAG0 -- Okay
+                    } 
+                }
+                
+                <!----- To Validate Remove Account from Account Group ------>
+                function fncValidateRemoval(chkElement,isAllowed,AccID){
+                    if(chkElement.checked)
+                    {
+                        if(!isAllowed){ // REMAGNOUSRACCS
+                            ShowAlert("Remove","Alert","REMAGNOUSRACCS",chkElement,AccID);
+                        }
+                        else if(ActiveGrpBP > 0){ // REMBPAG1A0OAG0
+                            ShowAlert("Remove","Confirmation","REMBPAG1A0OAG0",chkElement,AccID);
+                        } 
+                        else {
+                            fncConfirmSalesPlanAction(chkElement,AccID)
+                        }                 
+                    }
+                    else{
+                        fncRemoveAccIDToBeDelinkedorDeleted(AccID);
+                    }
+                }
+                
+                function fncConfirmSalesPlanAction(chkElement,AccID){                
+                    if(ActiveGrpSP > 0){
+                        ShowAlert("Remove","Multi-Action Confirmation","REMSPAG1A0OAG0",chkElement,AccID);
+                    }
+                } 
+                
+                function fncUncheckCheckbox(chkElement) {
+                    chkElement.checked = false;
+                } 
+                
+                function fncAddAccIDToBeDelinkedorDeleted(Action, AccID){
+                    var inptElement;
+                    
+                    if(Action == 'Delink')
+                        inptElement = $("[id$='DelinkSPAccs']");
+                    else if (Action == 'Delete')
+                        inptElement = $("[id$='DeleteSPAccs']");
+                        
+                    inptElement.val( inptElement.val() +  AccID + ',');
+                }
+                
+                function fncRemoveAccIDToBeDelinkedorDeleted(AccID){
+                    $("[id$='DelinkSPAccs']").val($("[id$='DelinkSPAccs']").val().replace(AccID+',',''));
+                    $("[id$='DeleteSPAccs']").val($("[id$='DeleteSPAccs']").val().replace(AccID+',',''));
+                }
+           </script>
+        </head>     
+
+        <body>
+            <apex:form >
+                
+                <apex:inputHidden id="DelinkSPAccs" value="{!DelinkSPAccs}"/>
+                <apex:inputHidden id="DeleteSPAccs" value="{!DeleteSPAccs}"/>
+                <apex:actionFunction name="fetchResults" action="{!updateAvailableList}" reRender="pnlAccountData" status="status" oncomplete="setTableCSS()"/>
+                <div class="container">
+                    <!----- Navbar ----->
+                    <div class="row">
+                        <nav class="navbar navbar-default navbar-fixed-top">
+                            <div class="container-fluid">
+                                <div class="navbar-header">
+                                    <a class="navbar-brand">Add accounts to:<b> {!Market__c.name}</b></a>
+                                </div>
+                            </div>
+                        </nav>
+                    </div>
+
+                    <!--------Breadscrum ---------->
+                    <div class="row">
+                        <ol class="breadcrumb">
+                            <li><i class="fa fa-shopping-bag fa-lg" style="color:green;"></i> Active Business Plans: <span class="badge">{!cntOfGrpBP }</span></li> <!-- fa-info-circle -->
+                            <li><i class="fa fa-shopping-cart fa-lg" style="color:green;"></i> Active Sales Objectives: <span class="badge">{!cntOfGrpSP }</span></li>
+                            <li class="pull-right"><apex:outputLink value="/{!Market__c.Id}"><i class="fa fa-arrow-left fa-lg"></i> Done</apex:outputLink></li>
+                        </ol>
+                    </div>
+                    
+                    <div class="row">
+                        <apex:outputPanel id="pnlAccountData">
+                            <div class="col-md-6">
+                                <div class="panel panel-primary">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Added Account(s)</h3>
+                                    </div>  
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="panel-body">
+                                                <input type="text" class="form-control" id="tblfilterSelectedAccount" data-action="filter" data-filters="#tblSelectedAccount"/>
+                                            </div>  
+                                        </div>  
+                                        <div class="col-md-6">
+                                            <div class="panel-body">
+                                                <!--<apex:commandButton styleClass="btn btn-primary btn-sm" action="{!RemoveAccountsFromGroup}" value="Remove Selected Account(s)" status="status" oncomplete="window.top.location.reload()"/> -->
+                                                <apex:commandButton styleClass="btn btn-primary btn-sm" action="{!RemoveAccountsFromGroup}" value="Remove Selected Account(s)" reRender="pnlAccountData,Message" status="status" oncomplete="setTableCSS()"/> 
+                                            </div>  
+                                        </div>  
+                                    </div>      
+
+                                    <div id="tblWrapper" class="border-bottom-0">
+                                        <table id="tblSelectedAccount" class="table table-sm table-responsive table-bordered table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Select</th>
+                                                    <th>Account Name</th>
+                                                    <th>Account Number</th>
+                                                </tr>
+                                            </thead>                                            
+                                            <tbody>
+                                                <apex:repeat value="{!ExistingAccounts}" var="selAcc">
+                                                    <tr>
+                                                        <td><apex:inputcheckbox value="{!selAcc.selected }" onclick="fncValidateRemoval(this,{!selAcc.allowRemoval},'{!selAcc.AccId}')"/></td>  
+                                                        <td><apex:outputText value="{!selAcc.AccountName }"/></td>
+                                                        <td><apex:outputText value="{!selAcc.AccountNumber}"/></td>
+                                                    </tr>
+                                                </apex:repeat>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="panel panel-primary">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Select Account(s) From: My Accounts and My Teams Accounts</h3>
+                                    </div>  
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="panel-body">
+                                                <apex:inputText styleclass="form-control" id="tblfilterSelectAccount" value="{!searchString}" onkeydown="if(event.keyCode==13){this.blur();}else{resetTimer();}"/>
+                                            </div>
+                                        </div>  
+                                        <div class="col-md-6">
+                                            <div class="panel-body">
+                                                <apex:commandButton styleClass="btn btn-primary btn-sm" value="Add Selected Account(s)" action="{!AddAccountsInGroup}" reRender="pnlAccountData,Message" status="status" oncomplete="setTableCSS()"/>
+                                            </div>  
+                                        </div>  
+                                    </div>      
+
+                                    <div id="tblWrapper">
+                                        <table id="tblSelectAccount" class="table table-sm table-responsive table-bordered table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Select</th>
+                                                    <th>Account Name</th>
+                                                    <th>Account Number</th>
+                                                    <th>Has BP</th>
+                                                </tr>
+                                            </thead>                                   
+                                            <tbody>
+                                                <apex:repeat id="pnlAvailableAccounts" value="{!AvailableSelectedAccounts}" var="selAcc">
+                                                    <tr>
+                                                        <td><apex:inputcheckbox title="{!selAcc.AccountName }" value="{!selAcc.selected }" onClick="fncValidateAddition(this,'{!selAcc.AccId}',{!selAcc.hasBP},{!selAcc.hasBPInOtherGrps })"/></td>
+                                                        <td><apex:outputText value="{!selAcc.AccountName }"/></td>
+                                                        <td><apex:outputText value="{!selAcc.AccountNumber}"/></td>
+                                                        <td><apex:image rendered="{!selAcc.hasBP}" url="{!$Resource.GreenTick}" width="20" height="20"/></td>
+                                                    </tr>
+                                                </apex:repeat>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </apex:outputPanel>
+                    </div>
+                </div>                
+
+                <!--Waiting Spinner ---> 
+                <apex:actionStatus id="status">
+                    <apex:facet name="start">                    
+                       <div class="loading">Loading&#8230;</div> 
+                    </apex:facet>
+                </apex:actionStatus>
+        
+                <!----- Alert----->
+                <div id="myModal" class="modal fade" data-keyboard="false">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div id="ModalHeader" class="modal-header modal-header-warning">
+                                <i class="fa fa-exclamation-triangle fa-lg"></i>&nbsp;<h4 class="modal-title" id="ModalTitle" style="display: inline"> Confirmation </h4>
+                            </div>                            
+                            <div class="modal-body">
+                                <p id="ModalBody"></p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" id="btnModal1" class="btn btn-default" data-dismiss="modal" style="display:none"></button>
+                                <button type="button" id="btnModal2" class="btn btn-primary" data-dismiss="modal" style="display:none"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="ModalMAC" class="modal fade" data-keyboard="false">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div id="ModalMACHeader" class="modal-header modal-header-warning">
+                                <i class="fa fa-exclamation-triangle fa-lg"></i>&nbsp;<h4 class="modal-title" id="ModalMACTitle" style="display: inline"> Confirmation </h4>
+                            </div>                            
+                            <div class="modal-body">
+                                <p id="ModalMACBody"></p>
+                            </div>
+                            <div class="modal-footer" style="text-align:left">
+                                <button type="button" id="btnModalMAC1" class="btn btn-default" data-dismiss="modal"></button><br/>
+                                <button type="button" style="margin-top: 5px;" id="btnModalMAC2" class="btn btn-default" data-dismiss="modal"></button><br/>
+                                <button type="button" style="margin-top: 5px;" id="btnModalMAC3" class="btn btn-primary" data-dismiss="modal"></button><br/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <apex:outputPanel id="Message">
+                    <script>
+                        var Message = '{!ErrorMessage}';
+                        
+                        if(Message != undefined && Message != null && Message != ''){
+                            ShowAlert("Error","Error",Message,'','');
+                        }
+                    </script>
+                </apex:outputPanel>
+                <!-- Script ----> 
+                <script>   
+                    <!----- Bootstrap Script ----->
+                     <apex:includeScript value="{!URLFOR($Resource.Bootstrap3, '/bootstrap3/js/bootstrap.min.js')}"/>
+                    <!----- Table Script ----->
+                     <apex:includeScript value="{!URLFOR($Resource.Bootstrap3, '/bootstrap3/js/jquery.tableHeadFixer.js')}"/>
+                     <apex:includeScript value="{!URLFOR($Resource.Bootstrap3, '/bootstrap3/js/jquery.tableSearch.js')}"/>
+                </script>                
+            </apex:form>
+        </body>
+    </html>
+</apex:page>

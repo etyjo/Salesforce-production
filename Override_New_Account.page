@@ -1,0 +1,17 @@
+<!---------------------------- Page Header ----------------------------
+- Description: Account Management - Visualforce page to override 
+Account New button so that user wont be able to create directly through Account Tab and redirected Prospects.
+- Author:
+- Related Metadata: 
+----------------------------------------------------------------------->
+<apex:page standardController="Account" showHeader="false">
+    <script type='text/javascript'>   
+        if ("{!$Profile.Name}" != "System Administrator"){
+            alert("Creation of new Accounts is only possible via Prospect Conversion. Please follow the prospect process.");
+            window.location = "/00Q/o";
+        }
+        else{
+            window.location = "{!URLFOR($Action.Account.New, null,[retURL=$Request.retURL],true)}"; 
+        }
+    </script>
+</apex:page>

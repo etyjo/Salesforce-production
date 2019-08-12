@@ -1,0 +1,9 @@
+<apex:page standardController="Strategy__c" >
+    <c:accountTeamAuthorization queryStringForObject="select id, Business_Plan__c, Objective_del__r.Business_Plan__r.Account__c, Objective_del__r.Business_Plan__r.Account__r.OwnerId, Objective_del__r.Business_Plan__r.Market__c, Objective_del__r.Business_Plan__r.Market__r.OwnerId from Strategy__c" 
+                                accountFieldNameForAccount="Objective_del__r:Business_Plan__r:Account__c"
+                                objectNameForNavigation="Strategy__c"
+                                parentFieldIdId="CF00N2400000ILF7c_lkid"
+                                queryStringForOwner="select id, Business_Plan__r.account__c, Business_Plan__r.account__r.OwnerId,Business_Plan__r.Market__c, Business_Plan__r.Market__r.OwnerId from Objective__c" 
+                                checkforOwnership="false" />
+                                                        
+</apex:page>

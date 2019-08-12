@@ -1,0 +1,57 @@
+<apex:page standardController="Sales_Plan__c" extensions="SP_Deep_Clone_Controller" id="PSP" tabStyle="Sales_Plan__c">
+
+  
+    <apex:form rendered="{!IF(valid,false,true)}">
+     <apex:outputPanel style="padding: 10px;">   
+        <div id="idNavigationBack" style="color : red">
+           Do not Clone Underlying Account Salesplan of AccountGroup from Account.
+           <br></br>
+           click below link to navigate back:
+        </div>
+       <apex:commandLink action="{!Cancel}" value="link"/>
+    </apex:outputPanel>
+   </apex:form>
+    <apex:form rendered="{!IF(valid,true,false)}" >
+     <apex:sectionHeader title="Sales Objective Edit" subtitle="Clone Sales Objective" />
+        <apex:pageBlock title="Sales Objective Edit" id="PBSOE" mode="inlineEdit" >
+            <apex:pageBlockButtons location="Both">
+                <apex:commandButton value="Save" action="{!Save}" />
+                <apex:commandButton value="Cancel" immediate="True" action="{!Cancel}" />
+            </apex:pageBlockButtons>
+         <apex:pageBlockSection title="Information" columns="2" id="PBSI" showHeader="True" collapsible="false" >
+             <apex:inputField value="{!newsp.Name}" />
+             <apex:inputField value="{!newsp.Active__c}"   />
+             
+             <apex:inputField value="{!newsp.Market__c}" rendered="{!(recordtype=='Account Group')}"/>
+             <apex:inputField value="{!newsp.Account__c}" rendered="{!(recordtype!='Account Group')}"/>
+
+             <apex:inputField value="{!newsp.Start_Date__c}" />
+             <apex:inputField value="{!newsp.Business_Plan__c}" />
+             <apex:inputField value="{!newsp.End_Date__c}" />
+             
+             <apex:inputField value="{!newsp.Related_Account_Group_Sales_Plan__c}" rendered="{!(recordtype!='Account Group')}" />
+             
+             <apex:inputField value="{!newsp.CurrencyIsoCode}" />
+             <span>
+             <apex:inputField value="{!newsp.Field_Measurement_Unit__c}" />
+             <span>    
+             <apex:inputField value="{!newsp.Total_Crop_Surface__c}" />
+             </span>
+             </span>
+            
+          </apex:pageBlockSection> 
+    
+        <apex:pageBlockSection title="Totals" columns="2" id="PBST" showHeader="True" collapsible="false" >
+             <apex:inputField value="{!newsp.Total_Seed_Potential__c}" />
+             <apex:inputField value="{!newsp.Customer_Share_CY__c}" />
+             <apex:inputField value="{!newsp.Total_Potential_Value__c}" />
+             <apex:inputField value="{!newsp.Customer_Share_CY_1__c}" />
+             <apex:inputField value="{!newsp.Realized_Currrent_Year_Value_TOTAL__c}" />
+             <apex:inputField value="{!newsp.Customer_Share_CY_2__c}" /> 
+             <apex:inputField value="{!newsp.Total_Amount_Forecast_CY__c}" /> 
+        </apex:pageBlockSection>
+            
+            
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

@@ -1,0 +1,5 @@
+<apex:page standardController="Lead" tabStyle="Lead">
+<flow:interview name="Convert_Lead">
+<apex:param name="vCompanyName" value="{!Lead.Company}"/> 
+</flow:interview>
+</apex:page>

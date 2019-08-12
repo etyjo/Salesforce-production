@@ -1,0 +1,148 @@
+<apex:component controller="accountTeamAuthorizationController">
+    <!-- Attributes required from the specific page -->
+    <apex:attribute assignTo="{!queryString}" name="queryStringForObject" required="true" description="Query string to fetch Account Id." type="string"/>
+    <apex:attribute assignTo="{!accountFieldName}" name="accountFieldNameForAccount" required="true" description="Name of field name." type="string"/>
+    <apex:attribute assignTo="{!objName}" name="objectNameForNavigation" required="true" description="Object name for navigation." type="string"/>
+
+    <apex:attribute assignTo="{!parentFieldId}" name="parentFieldIdId" required="true" description="Id of the field" type="string"/>        
+    <apex:attribute assignTo="{!qryStringForOwner}" name="queryStringForOwner" required="true" description="Query string to fetch Account Owner Id." type="string"/>
+    <apex:attribute assignTo="{!checkforOwner}" name="checkforOwnership" required="true" description="Query string to fetch Account Owner Id." type="boolean"/>
+    <apex:outputPanel id="msg">
+            <apex:messages style="color:red;" />
+    </apex:outputPanel>
+
+    <!-- Panel to show message as to navigate back to previous page with the link in it. -->
+    <apex:outputPanel rendered="{!NOT(navigateToNew) && NOT(navigateToEdit) && NOT(accountCheck)}" style="padding: 10px;" id="navigateBack">
+        Please click this <a href="{!navigationReturnUrl}">link</a> to navigate back.
+    </apex:outputPanel>        
+
+    <!-- Panel to navigate to the Edit/New record creation page -->
+    <apex:outputPanel rendered="{!navigateToNew}" id="navigateToNew">
+        <script>
+            if( (typeof sforce != 'undefined') && sforce && (!!sforce.one) ) {
+                // Salesforce1 navigation
+                
+                
+                if('{!objName}' == 'SWOT__c'){
+                    sforce.one.createRecord("SWOT__c");
+                }else if('{!objName}' == 'Business_Plan__c'){
+                    sforce.one.createRecord("Business_Plan__c");
+                    
+                }else if('{!objName}' == 'Objective__c'){
+                    sforce.one.createRecord("Objective__c");
+                    
+                }else if('{!objName}' == 'Strategy__c'){
+                    sforce.one.createRecord("Strategy__c");
+                }else if('{!objName}' == 'Case'){
+                    sforce.one.createRecord("Case");
+                    
+                }
+            }else{    
+                if('{!accountCheck}' == 'false'){
+                    if('{!objName}' == 'SWOT__c'){
+                        window.location = "{!URLFOR($Action.SWOT__c.New, null,[retURL=$CurrentPage.parameters.retURL,CF00N2400000ILF1a=$CurrentPage.parameters.CF00N2400000ILF1a,CF00N2400000ILF1a_lkid=$CurrentPage.parameters.CF00N2400000ILF1a_lkid],true)}"; 
+                    }else if('{!objName}' == 'Business_Plan__c'){
+                        if('{!objectNameBeingOperated}' == 'Account')
+                            window.location = "{!URLFOR($Action.Business_Plan__c.New, null,[retURL=$CurrentPage.parameters.retURL,CF00N2400000ILF3a=$CurrentPage.parameters.CF00N2400000ILF3a,CF00N2400000ILF3a_lkid=$CurrentPage.parameters.CF00N2400000ILF3a_lkid],true)}"; 
+                        if('{!objectNameBeingOperated}' == 'Market__c')  
+                            window.location = "{!URLFOR($Action.Business_Plan__c.New, null,[retURL=$CurrentPage.parameters.retURL,CF00N2400000ILF3d=$CurrentPage.parameters.CF00N2400000ILF3d,CF00N2400000ILF3d_lkid=$CurrentPage.parameters.CF00N2400000ILF3d_lkid],true)}";   
+                    }else if('{!objName}' == 'Objective__c'){
+                        window.location = "{!URLFOR($Action.Objective__c.New, null,[retURL=$CurrentPage.parameters.retURL,CF00N2400000ILF1Y=$CurrentPage.parameters.CF00N2400000ILF1Y,CF00N2400000ILF1Y_lkid=$CurrentPage.parameters.CF00N2400000ILF1Y_lkid],true)}"; 
+                    }else if('{!objName}' == 'Strategy__c'){
+                        window.location = "{!URLFOR($Action.Strategy__c.New, null,[retURL=$CurrentPage.parameters.retURL,CF00N2400000ILF7c=$CurrentPage.parameters.CF00N2400000ILF7c,CF00N2400000ILF7c_lkid=$CurrentPage.parameters.CF00N2400000ILF7c_lkid],true)}"; 
+                    }else if('{!objName}' == 'Case'){
+                        window.location = "{!URLFOR($Action.Case.NewCase, null,[retURL=$CurrentPage.parameters.retURL,def_account_id=$CurrentPage.parameters.def_account_id],true)}"; 
+                    }
+                }else if('{!accountCheck}' == 'true'){
+                    if('{!objName}' == 'SWOT__c'){
+                        window.location = "{!URLFOR($Action.SWOT__c.New, null,[retURL=$CurrentPage.parameters.retURL],true)}"; 
+                    }else if('{!objName}' == 'Business_Plan__c'){
+                        window.location = "{!URLFOR($Action.Business_Plan__c.New, null,[retURL=$CurrentPage.parameters.retURL],true)}"; 
+                    }else if('{!objName}' == 'Case'){
+                        window.location = "{!URLFOR($Action.Case.NewCase, null,[retURL=$CurrentPage.parameters.retURL],true)}"; 
+                    }else if('{!objName}' == 'Objective__c'){
+                        window.location = "{!URLFOR($Action.Objective__c.New, null,[retURL=$CurrentPage.parameters.retURL],true)}"; 
+                    }else if('{!objName}' == 'Strategy__c'){
+                        window.location = "{!URLFOR($Action.Strategy__c.New, null,[retURL=$CurrentPage.parameters.retURL],true)}"; 
+                    }
+                }
+            }
+        </script>
+    </apex:outputPanel>
+    
+    
+    <!-- Panel to navigate to the Edit page for SWOT-->
+    <apex:outputPanel rendered="{!IF(navigateToEdit && objName =='SWOT__c',true,false)}" id="swotEdit">
+        <script>
+            if( (typeof sforce != 'undefined') && sforce && (!!sforce.one) ) {
+                // Salesforce1 navigation
+                sforce.one.editRecord('{!recordId}');
+                //sforce.one.navigateToURL("/001/e");
+            }else{ 
+                if('{!objName}' == 'SWOT__c'){
+                    window.location = "{!URLFOR($Action.SWOT__c.Edit, $CurrentPage.parameters.Id, [retURL=$CurrentPage.parameters.retURL],true)}";   
+                }                 
+            }
+        </script>
+    </apex:outputPanel>
+    
+    <!-- Panel to navigate to the Edit page for Business Plan-->
+    <apex:outputPanel rendered="{!IF(navigateToEdit && objName =='Business_Plan__c',true,false)}" id="bpEdit">
+        <script>
+            if( (typeof sforce != 'undefined') && sforce && (!!sforce.one) ) {
+                // Salesforce1 navigation
+                sforce.one.editRecord('{!recordId}');
+                //sforce.one.navigateToURL("/001/e");
+            }else{ 
+                 if('{!objName}' == 'Business_Plan__c'){
+                    window.location = "{!URLFOR($Action.Business_Plan__c.Edit, $CurrentPage.parameters.Id, [retURL=$CurrentPage.parameters.retURL],true)}";   
+                }                 
+            }
+        </script>
+    </apex:outputPanel>
+    
+    <!-- Panel to navigate to the Edit page for Objective -->
+    <apex:outputPanel rendered="{!IF(navigateToEdit && objName =='Objective__c',true,false)}" id="objectiveEdit">
+        <script>
+            if( (typeof sforce != 'undefined') && sforce && (!!sforce.one) ) {
+                // Salesforce1 navigation
+                sforce.one.editRecord('{!recordId}');
+                //sforce.one.navigateToURL("/001/e");
+            }else{ 
+                 if('{!objName}' == 'Objective__c'){
+                    window.location = "{!URLFOR($Action.Objective__c.Edit, $CurrentPage.parameters.Id, [retURL=$CurrentPage.parameters.retURL],true)}";   
+                }                 
+            }
+        </script>
+    </apex:outputPanel>
+    
+    <!-- Panel to navigate to the Edit page for Strategy -->
+    <apex:outputPanel rendered="{!IF(navigateToEdit && objName =='Strategy__c',true,false)}" id="strategyId">
+        <script>
+            if( (typeof sforce != 'undefined') && sforce && (!!sforce.one) ) {
+                // Salesforce1 navigation
+                sforce.one.editRecord('{!recordId}');
+                //sforce.one.navigateToURL("/001/e");
+            }else{ 
+                 if('{!objName}' == 'Strategy__c'){
+                    window.location = "{!URLFOR($Action.Strategy__c.Edit, $CurrentPage.parameters.Id, [retURL=$CurrentPage.parameters.retURL],true)}";   
+                }                 
+            }
+        </script>
+    </apex:outputPanel>
+    
+    <!-- Panel to navigate to the Edit page for Case -->
+    <apex:outputPanel rendered="{!IF(navigateToEdit && objName =='Case',true,false)}" id="caseId">
+        <script>
+            if( (typeof sforce != 'undefined') && sforce && (!!sforce.one) ) {
+                // Salesforce1 navigation
+                sforce.one.editRecord('{!recordId}');
+                //sforce.one.navigateToURL("/001/e");
+            }else{ 
+                 if('{!objName}' == 'Case'){
+                    window.location = "{!URLFOR($Action.Case.Edit, $CurrentPage.parameters.Id, [retURL=$CurrentPage.parameters.retURL],true)}";   
+                }                 
+            }
+        </script>
+    </apex:outputPanel>
+</apex:component>

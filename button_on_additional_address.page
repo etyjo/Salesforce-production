@@ -1,0 +1,21 @@
+<apex:page standardController="Additional_Address__c" recordSetVar="Additional Addresses" extensions="addressButtonExt">
+    <apex:outputPanel >
+        <script type="text/javascript">
+        
+        if( (typeof sforce != 'undefined') && sforce && (!!sforce.one) ) {
+            // Salesforce1 navigation
+            sforce.one.createRecord("Additional_Address__c", "{!JSENCODE(Query)}");
+        }
+        else {
+            // Set the windows URL using a Visualforce expression
+            //var URL = "{!$Label.AdditionalAddress}&RecordType={!JSENCODE(Query)}";
+            var URL = "{!$Label.AdditionalAddress}{!$Label.AdditionalAddressAccountFieldId}={!URLENCODE(accountName)}&{!$Label.AdditionalAddressAccountFieldId}_lkid={!JSENCODE(accountId)}&RecordType={!JSENCODE(Query)}";
+            
+            
+        
+            window.location.href = URL;
+        }
+            
+        </script>
+    </apex:outputPanel>
+</apex:page>

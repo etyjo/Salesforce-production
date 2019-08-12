@@ -1,0 +1,11 @@
+<apex:page tabStyle="Account" standardController="Account" extensions="AccountLocationController" action="{!getSoldLocation}">
+
+	<apex:messages rendered="{!!markersLoaded}" />
+
+	<apex:map width="100%" height="200px" mapType="roadmap" zoomlevel="15" rendered="{!markersLoaded}">
+		<apex:repeat value="{!mapMarkers}" var="marker">
+			<apex:mapMarker title="{!marker.name}"
+							position="{!marker.locationString}" />
+		</apex:repeat>
+	</apex:map>
+</apex:page>

@@ -1,0 +1,331 @@
+<apex:page standardController="Opportunity" extensions="opportunityProductEntryExtension" showHeader="true" sidebar="true">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <apex:includeScript value="{!$Resource.jQuery}" />
+    
+    <apex:sectionHeader Title="Manage {!$ObjectType.Product2.LabelPlural}" subtitle="{!opportunity.Name}"/>
+
+    <apex:outputPanel id="msgPanel">
+        <apex:messages style="color:red"/>
+    </apex:outputPanel>
+    <style>
+        .search{
+            font-size:14pt;
+            margin-right: 20px;    
+        }
+        .fyi{
+            color:red;
+            font-style:italic;
+        }
+        .label{
+            margin-right:10px;
+            font-weight:bold;
+        }
+        
+        button.showPointer{
+            cursor: pointer;
+        } 
+        
+        .success-color{
+            background-color: #27C327;
+        }
+        .failure-color{
+            background-color: red;
+        }          
+    </style>
+    
+    <script type='text/javascript'>
+        // This script assists the search bar functionality
+        // It will execute a search only after the user has stopped typing for more than 1 second
+        // To raise the time between when the user stops typing and the search, edit the following variable:
+        
+        var waitTime = 1;
+        
+    
+        var countDown = waitTime+1;
+        var started = false;
+        
+        function resetTimer(){
+        
+            countDown=waitTime+1;
+            
+            if(started==false){
+                started=true;
+                runCountDown();
+            }
+        }
+        
+        function runCountDown(){
+        
+            countDown--;
+            
+            if(countDown<=0){
+                fetchResults();
+                started=false;
+            }
+            else{
+                window.setTimeout(runCountDown,1000);
+            }
+        }
+        
+        
+        //To get the Package Size and Quantity
+        function getProductDetails(index, priceEntryID){
+            
+            var idPS = 'ps'+index;
+            var idQT = 'qt'+index;
+            var packageSize = $('#'+idQT + ' input').val();
+            var quantity = $('#'+idPS + ' select').val();
+            
+            //call actionfunction to call action method
+            getPricingDetailsCall(index, priceEntryID, quantity, packageSize);
+        }
+        
+        //To get the Package Size and Quantity
+        function eraseQuantity(index){
+            var idQT = 'qt'+index;    
+            var quantity =$('#'+idQT + ' input').val();
+            if(quantity == 0 || quantity == 0.00 || quantity == 0.0 || quantity == '0,00' || quantity == '0,0' || quantity == '0'){
+                $('#'+idQT + ' input').val('');
+            }
+        }    
+        
+        //To avoid the Save the record when user presses enter - TKT-000154
+        function noenter(e){               
+            if(window.event){                    
+                key = window.event.keyCode;     //IE               
+            } 
+            else{                    
+                key = e.which;     //firefox               
+            }              
+            if(key == 13) {                    
+                return false;                               
+            }          
+        }
+    </script>
+   
+  
+    <apex:form id="idForm">
+        
+        <!--<apex:messages style="color:red" id="errMsg"/>-->
+        
+        <apex:actionFunction action="{!priceBookCheck}" name="priceBookCheckCall" reRender="idForm"/>
+        <apex:outputPanel id="mainBody">
+        
+            <apex:outputLabel styleClass="label">PriceBook: </apex:outputLabel>
+            <apex:outputText value="{!theBook.Name}"/>&nbsp;
+            <apex:commandLink action="{!changePricebook}" value="change" immediate="true"/>
+            <br/>
+            <!-- not everyone is using multi-currency, so this section may or may not show -->
+            <apex:outputPanel rendered="{!multipleCurrencies}">
+                <apex:outputLabel styleClass="label">Currency: </apex:outputLabel>
+                <apex:outputText value="{!chosenCurrency}"/>
+                <br/>
+            </apex:outputPanel>
+            <br/>
+            
+            <!-- this is the upper table... a.k.a. the "Shopping Cart"-->
+            <apex:actionFunction action="{!getPricingDetails}" name="getPricingDetailsCall" status="pricingInterfaceStatus" reRender="selected, msgPanel">
+                <apex:param value="" assignTo="{!productIndex}" name="productIndex"/>
+                <apex:param value="" assignTo="{!productId}" name="productId"/>
+                <apex:param value="" assignTo="{!tempPackageSize}" name="tempPackageSize"/>
+                <apex:param value="" assignTo="{!tempQuantity}" name="tempQuantity"/>
+            </apex:actionFunction>
+            
+            <!-- notice we use a lot of $ObjectType merge fields... I did that because if you have changed the labels of fields or objects it will reflect your own lingo -->
+            <apex:pageBlock title="Selected {!$ObjectType.Product2.LabelPlural}" id="selected">
+                <apex:actionregion >
+                <apex:pageblockTable value="{!listSOProducts}" var="s">
+                    <div id="checkDiv">
+                    <apex:column >
+                        <apex:commandLink value="Remove" action="{!removeFromShoppingCart}" reRender="selected,searchResults" immediate="true" status="removalStatus">
+                            <!-- this param is how we send an argument to the controller, so it knows which row we clicked 'remove' on -->
+                            <apex:param value="{!s.productIndex}" assignTo="{!toUnselect}" name="toUnselect"/>
+                        </apex:commandLink>
+                    </apex:column>
+                    
+                    <apex:column headerValue="{!$ObjectType.Product2.LabelPlural}" value="{!s.salesOrderLineItem.PriceBookEntry.Product2.Name}" styleClass="pricestatus"/>
+                    
+                    <apex:column headerValue="{!$ObjectType.OpportunityLineItem.Fields.SF_ST_Description__c.Label}" value="{!s.salesOrderLineItem.PriceBookEntry.Product2.SF_ST_Description__c}"/>
+                    
+                    <apex:column headerValue="{!$ObjectType.OpportunityLineItem.Fields.Seed_Size_Description__c.Label}" value="{!s.salesOrderLineItem.PriceBookEntry.Product2.Seed_Size_Description__c}"/>
+                                        
+                    <apex:column headerValue="{!$ObjectType.OpportunityLineItem.Fields.Quantity.Label}">
+                        <div id="qt{!s.productIndex}">
+                            <apex:inputField value="{!s.salesOrderLineItem.Quantity}" style="width:70px" onclick="eraseQuantity('{!s.productIndex}');" onblur="getProductDetails('{!s.productIndex}','{!s.salesOrderLineItem.PriceBookEntryId}');" onkeypress="return noenter(event)"/>
+                        </div>
+                    </apex:column>
+                    
+                    <apex:column headerValue="{!$ObjectType.OpportunityLineItem.Fields.Package_Size__c.Label}">
+                        
+                        <div id="ps{!s.productIndex}">
+                        <apex:selectList value="{!s.salesOrderLineItem.Package_Size__c}" style="width:70px" required="false" multiselect="false" size="1" onchange="getProductDetails('{!s.productIndex}','{!s.salesOrderLineItem.PriceBookEntryId}');">
+                            <apex:selectOptions value="{!mapPackageSize[s.productIndex]}"></apex:selectOptions>
+                        </apex:selectList>
+                        </div>
+                    </apex:column>
+                    
+                    <apex:column headerValue="{!$ObjectType.OpportunityLineItem.Fields.Number_of_Packages__c.Label}">
+                        <apex:inputField value="{!s.salesOrderLineItem.Number_of_Packages__c}" style="width:70px" required="false" onkeypress="return noenter(event)" />
+                    </apex:column>
+                    
+                    <apex:column headerValue="{!$ObjectType.OpportunityLineItem.Fields.Package_Layout__c.Label}">
+                        <apex:inputField value="{!s.salesOrderLineItem.Package_Layout__c}" style="width:70px" required="false" onkeypress="return noenter(event)"/>
+                    </apex:column>
+                    
+                    <apex:column headerValue="{!$ObjectType.OpportunityLineItem.Fields.Picture_Label__c.Label}">
+                        <apex:inputField value="{!s.salesOrderLineItem.Picture_Label__c}" style="width:70px" required="false" onkeypress="return noenter(event)"/>
+                    </apex:column>
+                    
+                    <apex:column headerValue="{!$ObjectType.Opportunity.Fields.Sales_Order_Currency__c.Label}">
+                        <apex:inputField value="{!Opportunity.Sales_Order_Currency__c}" style="width:70px" required="false" />
+                    </apex:column>
+                    
+                    <apex:column headerValue="{!$ObjectType.OpportunityLineItem.Fields.UnitPrice.Label}">
+                        <apex:outputField value="{!s.salesOrderLineItem.UnitPrice}" style="width:70px" rendered="{!IF(s.salesOrderLineItem.Id != null, true, false)}" />
+                        <div style="display:{!IF(s.salesOrderLineItem.Id != null, 'none', 'block')}">{!Opportunity.Sales_Order_Currency__c} {!s.salesOrderLineItem.UnitPrice}</div>
+                    </apex:column>                
+                    
+                    <apex:column headerValue="{!$ObjectType.OpportunityLineItem.Fields.Sales_Price_UOM__c.Label}">
+                        <apex:outputField value="{!s.salesOrderLineItem.Sales_Price_UOM__c}" style="width:70px" />
+                    </apex:column>                
+                            
+                                        
+                    <apex:column headerValue="{!$ObjectType.OpportunityLineItem.Fields.Operator__c.Label}">
+                        <apex:inputField value="{!s.salesOrderLineItem.Operator__c}" style="width:70px" required="false" onkeypress="return noenter(event)"/>
+                    </apex:column>
+                    
+                     <apex:column headerValue="{!$ObjectType.OpportunityLineItem.Fields.Discount_Value__c.Label}">
+                        <apex:inputField value="{!s.salesOrderLineItem.Discount_Value__c}" style="width:70px" required="false" onkeypress="return noenter(event)"/>
+                    </apex:column>
+                    
+                    <apex:column headerValue="{!$ObjectType.OpportunityLineItem.Fields.Monetary_Discount__c.Label}">
+                        <apex:inputField value="{!s.salesOrderLineItem.Monetary_Discount__c}" style="width:70px" required="false" />
+                    </apex:column>
+                    
+                    <apex:column headerValue="{!$ObjectType.OpportunityLineItem.Fields.Actual_Sales_Price__c.Label}">
+                        <apex:inputField value="{!s.salesOrderLineItem.Actual_Sales_Price__c}" style="width:70px" required="false" />
+                    </apex:column>
+                    
+                    <apex:column headerValue="{!$ObjectType.OpportunityLineItem.Fields.Sales_Amount__c.Label}">
+                        <apex:inputField value="{!s.salesOrderLineItem.Sales_Amount__c}" style="width:70px" required="false" />
+                    </apex:column>
+                    
+                    <apex:column headerValue="{!$ObjectType.OpportunityLineItem.Fields.Remarks__c.Label}">
+                        <apex:inputField value="{!s.salesOrderLineItem.Remarks__c}" style="width:70px" required="false" onkeypress="return noenter(event)"/>
+                    </apex:column>
+                    <apex:column headerValue="Sales price Status" style="">
+                        <span id="status{!s.salesOrderLineItem.pricebookentryid}" class="pricestatus">
+                        <apex:image rendered="{!mapStatusDisplay[s.productIndex].Status == 'Success'}" url="/img/permissions_confirm16.gif" title="{!mapStatusDisplay[s.productIndex].Message}"/>
+                        <apex:image rendered="{!mapStatusDisplay[s.productIndex].Status == 'Failure'}" url="/img/permissions_deny16.gif" title="{!mapStatusDisplay[s.productIndex].Message}" />
+                        </span>
+                    </apex:column> 
+                    </div>                                                           
+                </apex:pageblockTable>
+                </apex:actionregion>
+                <apex:pageBlockButtons >
+                    <apex:commandButton action="{!onSave}" value="Save" />
+                    <apex:commandButton action="{!onCancel}" value="Cancel" immediate="true"/>
+                    <i>
+                        <apex:actionStatus id="pricingInterfaceStatus" startText="Looking for Sales Price in ERP system..." stopText=" "/>
+                        <apex:actionStatus id="removalStatus" startText="Removing the record from list..." stopText=" "/>
+                    </i>
+                </apex:pageBlockButtons>
+            
+            </apex:pageBlock>
+    
+<!-- this is the lower table: search bar and search results -->
+    
+            <apex:pageBlock >
+                <apex:actionRegion renderRegionOnly="false" immediate="true">
+                
+                    <apex:actionFunction name="fetchResults" action="{!updateAvailableList}" reRender="searchResults" status="searchStatus"/>
+            
+            
+                <apex:outputPanel styleClass="search">
+                    Search for {!$ObjectType.Product2.LabelPlural}:
+                </apex:outputPanel>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                
+                <!-- here we invoke the scripting to get out fancy 'no button' search bar to work -->
+                    <apex:inputText value="{!searchString}" onkeydown="if(event.keyCode==13){this.blur();}else{resetTimer();}" style="width:150px"/>
+                    &nbsp;&nbsp;
+                    
+                <apex:outputLabel styleClass="search">                        
+                     Assortment Type:&nbsp; <apex:selectList size="1" value="{!selectedAssortmentType}" onchange="fetchResults();" style="width:120px">
+                      <apex:selectOptions value="{!AssortmentTypelist}"/>
+                    </apex:selectList>                                 
+                </apex:outputLabel> &nbsp;&nbsp;&nbsp;&nbsp;
+                
+                <apex:outputPanel styleClass="search">
+                    Type Code:&nbsp; <apex:inputText title="searchTextTypeName" value="{!searchTextTypeName}" onkeydown="if(event.keyCode==13){this.blur();}else{resetTimer();}" style="width:120px" label="test"/>
+                </apex:outputPanel>&nbsp;&nbsp;&nbsp;&nbsp; 
+                
+                <apex:outputLabel styleClass="search">                        
+                    Variety Name:&nbsp; <apex:inputText title="searchTextTypeName" value="{!searchTextVarietyName}" onkeydown="if(event.keyCode==13){this.blur();}else{resetTimer();}" style="width:120px" label="test"/>                                  
+                </apex:outputLabel> &nbsp;&nbsp;&nbsp;&nbsp;
+                
+                <apex:outputPanel styleClass="search">
+                    SF/ST Description:&nbsp;<apex:inputText value="{!searchTextSfStDescription}" onkeydown="if(event.keyCode==13){this.blur();}else{resetTimer();}" style="width:140px"/>
+                </apex:outputPanel>&nbsp;&nbsp;&nbsp;&nbsp;    
+                    
+                    <i>
+                        <!-- actionStatus component makes it easy to let the user know when a search is underway -->
+                        <apex:actionStatus id="searchStatus" startText="searching..." stopText=" "/>
+                        <apex:actionStatus id="addProductStatus" startText="Adding product..." stopText=" "/>
+                    </i>
+                    
+                </apex:actionRegion>
+            
+                <br/>
+                <br/>
+            
+                <apex:outputPanel id="searchResults">
+                
+                    <apex:pageBlockTable value="{!AvailableProducts}" var="a">
+                    
+                        <apex:column >
+                            <!-- command button in a column... neato -->
+                            <apex:commandButton value="Select" action="{!addToShoppingCart}" reRender="selected,searchResults" immediate="true" status="addProductStatus">
+                                <!-- again we use apex:param to be able to tell the controller which row we are working with -->
+                                <apex:param value="{!a.Id}" assignTo="{!toSelect}" name="toSelect"/>
+                            </apex:commandButton>
+                        </apex:column>
+                     
+                        <apex:column headerValue="{!$ObjectType.Product2.Fields.Variety_Name__c.Label}" value="{!a.Product2.Variety_Name__r.Name}"/>
+                        
+                        <apex:column headerValue="{!$ObjectType.Product2.Fields.SF_ST_Description__c.Label}" value="{!a.Product2.SF_ST_Description__c}"/>
+                        
+                        <apex:column headerValue="{!$ObjectType.Product2.Fields.Seed_Size_Description__c.Label}" value="{!a.Product2.Seed_Size_Description__c}"/>
+                        
+                        <apex:column headerValue="{!$ObjectType.Product2.Fields.Crop_Code__c.Label}" value="{!a.Product2.Crop_Code__c}"/>
+                        
+                        <apex:column headerValue="{!$ObjectType.Product2.Fields.Assortment_Type__c.Label}" value="{!a.Product2.Assortment_Type__c}"/>
+                        
+                        <apex:column headerValue="{!$ObjectType.Product2.Fields.Type_Code__c.Label}" value="{!a.Product2.Type_Code__c}"/> 
+                        
+                        <apex:column headerValue="{!$ObjectType.Product2.Fields.Name.Label}" value="{!a.Product2.Name}" />                       
+                        
+                        
+                    </apex:pageBlockTable>
+                    
+                    <!-- We put up a warning if results exceed 100 rows -->
+                    <apex:outputPanel styleClass="fyi" rendered="{!overLimit}">
+                        <br/>
+                        Your search returned over 100 results, use a more specific search string if you do not see the desired {!$ObjectType.Product2.Label}.
+                        <br/>
+                    </apex:outputPanel>
+                    
+                </apex:outputPanel>
+            
+            </apex:pageBlock>
+            
+        </apex:outputPanel>
+
+    </apex:form>
+    <script>
+        function load() {
+            //console.log("load event detected!");
+            priceBookCheckCall();
+        }
+        window.onload = load;
+    </script>
+</apex:page>

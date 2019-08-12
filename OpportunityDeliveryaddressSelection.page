@@ -1,0 +1,625 @@
+<apex:page standardController="Opportunity" extensions="AdAddressctl" sidebar="false" standardStylesheets="false">
+
+   <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <apex:stylesheet value="{!URLFOR($Resource.bootstrap, '/bootstrap-3.3.6-dist/css/bootstrap.min.css')}"/> 
+    <!--<apex:stylesheet value="{!URLFOR($Resource.bootstrap, '/bootstrap-3.3.6-dist/css/icons.css')}"/> 
+    <apex:stylesheet value="{!URLFOR($Resource.bootstrap, '/bootstrap-3.3.6-dist/css/styles.css')}"/> 
+    <apex:stylesheet value="{!URLFOR($Resource.bootstrap, '/bootstrap-3.3.6-dist/css/OneStarter.css')}"/>-->
+    
+    <apex:includeScript value="{!$Resource.jQuery}" />
+    <apex:includeScript value="{!URLFOR($Resource.bootstrap, '/bootstrap-3.3.6-dist/js/bootstrap.min.js')}"/>
+    <!--<apex:includeScript value="{!URLFOR($Resource.bootstrap, '/bootstrap-3.3.6-dist/js/jquery.touchSwipe.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.bootstrap, '/bootstrap-3.3.6-dist/js/jquery.onestarter.js')}"/>-->
+    <style>
+        .background{
+            background-color: #F4F6F9;
+            font-family: "ProximaNovaSoft-Regular", Calibri,
+            "Gill Sans", "Gill Sans MT", Candara, Segoe,
+            "Segoe UI", Arial, sans-serif;  
+        }
+        
+        .font-label{
+            color: #464646;
+        }
+        .font-value{
+            color: #485E7F;
+        }
+        
+        .font-header1{
+            color: #70809B;
+        }
+        
+        .font-header1{
+            color: #70809B;
+        }
+        
+        .font-header2{
+            color: #7989A6;
+        }
+        
+        .font-actionstatus{
+            font-size : 15px;
+        }
+        
+        .product{
+            padding: 15px;
+            border-bottom: 1px solid #D8DDE6;
+            background-color: #FFF;
+            
+        }
+        
+        .product> .product-label{
+            color: #1a8950;
+            //color: #464646;
+            font-size: 16px;
+            font-weight: 100;
+            margin-bottom: 10px;
+         }
+        
+        .product > .product-value{
+            color: #485E7F;
+            font-size: 15px;
+            font-weight: 500;   
+        }
+
+        
+        .field-row{
+            background-color: #FFF;
+        }
+        .field-row span, .field-row div{
+            font-weight: 400;
+            font-weight: normal;
+            font-style: normal;
+            font-size: 18px;
+            color: #54698D;
+        }
+        
+        .field-row input, .field-row select{
+            border: 1px solid #D8DDE6; /* #1589EE;*/
+            box-shadow: 0px 0px 0px;
+            height: 41px;
+        }
+        
+        .field-row > .row{
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+        
+        .btn-row{
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        .btn-size{
+            width: 10%;
+            font-size: 25px;
+            line-height: 15px;
+        }
+        
+        .btn-size-small{
+            width: 100%;
+            font-size: 16px;
+            line-height: 24px;
+        }
+        .btn-cancel{
+            color: #005FB2 !important;
+            border : 1px solid #D8DDE6 !important;
+            background-color : #F4F6F9 !important;
+        }
+        
+        .btn-save{
+            background-color : #005FB2;
+            border : 1px solid #0070D2 !important;
+            color : #fff !important;
+        }
+        .searchbox{
+            height: 45px !important;
+            margin-bottom : 10px;
+        } 
+        
+        .loading {
+            position: fixed;
+            z-index: 999;
+            height: 4696px;
+            width: 100%;
+            overflow: show;
+            margin: auto;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            opacity: 0.3;
+            background-color: gray;
+        }
+
+        .overlay{
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: #7E8C99;
+            z-index: 1800;
+            min-height: 100%;
+            width: 100%;
+            overflow: show;
+
+            opacity: 0.8;
+            height: 4696px;
+            display: block;
+        }
+        
+        .loader{
+            display: flex;
+            margin: auto;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+        }
+        
+        .opportunity{
+            text-align : center;
+        }
+        
+        .opportunity > .head{
+            color: #02325C;
+            font-size: 24px;
+        }
+        
+        .opportunity > .body{
+            color: #54698D;
+            font-size:16px;
+        }
+        
+        .dot{
+            border-radius: 3px;
+            height: 6px;
+            width: 6px;
+            background-color: #54698D;
+            display: inline-block;
+            margin-bottom: 2px;
+            margin-left: 5px;
+            margin-right: 5px;
+        }
+        
+        .opportunity > .logo{
+            background-image: url(/img/icon/t4v35/standard/opportunity_120.png);
+            height: 50px;
+            width: 50px;
+            background-size: 50px;
+            background-color: #FCB95B;
+            background-repeat: no-repeat;
+            border-radius: 4px;
+            margin: auto;
+        }
+        
+        .opp-lineitem{
+            padding: 15px;
+            border-bottom: 1px solid #D8DDE6;
+            background-color: #FFF;
+        }
+        
+        .opp-lineitem .title{
+            padding: 16px;
+            color: #16325C;
+            font-weight: 400;
+            line-height : 0px;
+        }
+        .opp-lineitem .head{
+            color: #54698D;
+            font-size: 14px;
+            font-weight: 400;
+            line-height : 19.25px;
+            
+            display: inline-block;
+            white-space: nowrap;
+            overflow: hidden !important;
+            text-overflow: ellipsis;
+        }
+        
+        .opp-lineitem .value{
+
+            color: #16325C;
+            font-size: 14px;
+            font-weight: 400;
+            line-height : 19.25px;
+        }
+        
+        .opp-lineitem-edit{
+            color: #4bca81;
+            font-size: 13px;
+            padding-right : 7px;
+        }
+        
+        .opp-lineitem-delete{
+            color: #d4504c;
+            font-size: 13px;
+            padding-right : 7px;
+        }
+        /*.opp-lineitem > .head > .sub-head{
+            font-size:12px;
+            font-weight:bold;
+            padding-left: 5px;
+            margin-botton: 2px;
+        }*/
+        
+        .tag{
+            color : #0070D2;
+            font-size : 12px;
+            font-weight: bold; 
+        }
+        
+        .pistatus-error{
+            float: right;
+            color: #d4504c !important;
+            cursor: pointer;
+        }
+        
+        .pistatus-success{
+            float: right;
+            color: #4bca81 !important;
+            cursor: pointer;
+        }
+        
+        .cuf-content{
+            padding: 0px !important;
+        }
+        
+        @media only screen 
+          and (min-device-width: 414px) 
+          and (max-device-width: 736px) 
+          and (-webkit-min-device-pixel-ratio: 3)
+          and (orientation: portrait){ 
+
+
+            .forceChatterAlohaPagePost .pageWrapper{
+                padding: 0px !important;
+            }
+            
+            .forceChatterAlohaPagePost .pageWrapper, body{
+                margin: 0px !important;
+                padding: 0px !important;
+            }
+            
+            .forceChatterPublisherPresentationMobile .titleBar + .cuf-content{
+                padding-top : 0px !important;
+            }
+            .forceChatterPublisherPresentationMobile .cuf-content {
+                box-sizing: border-box;
+                height: 0%;
+            }
+        }
+        
+        @media only screen 
+          and (min-device-width: 320px) 
+          and (max-device-width: 568px)
+          and (-webkit-min-device-pixel-ratio: 2)
+          and (orientation: portrait) {
+          
+          .forceChatterAlohaPagePost .pageWrapper{
+                padding: 0px !important;
+            }
+            
+            .forceChatterAlohaPagePost .pageWrapper, body{
+                margin: 0px !important;
+                padding: 0px !important;
+            }
+            
+            .forceChatterPublisherPresentationMobile .titleBar + .cuf-content{
+                padding-top : 0px !important;
+            }
+            .forceChatterPublisherPresentationMobile .cuf-content {
+                box-sizing: border-box;
+                height: 0%;
+            }
+            .forceChatterAlohaPagePost .pageWrapper{
+                margin: 0px !important;
+                padding: 0px !important;
+            }
+          
+        }
+        
+        
+        .forceChatterAlohaPagePost .pageWrapper{
+            margin: 0px !important;
+            padding: 0px !important;
+        }
+        /*--vertically align center--*/
+        .modal-dialog {
+            height: 80% !important;
+            padding-top:10%;
+        }
+        
+        .modal-content {
+            /*height: 100% !important;*/
+            overflow:visible;
+        }
+        
+        .modal-body {
+            height: 80%;
+            overflow: auto;
+        }
+        
+        .error-msg{
+            color: red;
+            padding-top: 10px;
+        }
+        
+        .screen-title{
+            color: #54698D;
+            font-family : "Salesforce Sans",Arial,sans-serif;
+            font-size : 14px;
+            font-weight: 400;
+            line-height: 17.5px;
+            margin-bottom: 7px;
+            padding-bottom: 8px;
+            padding-left: 16px;
+            padding-right: 16px;
+            padding-top: 8px;
+            text-transform: uppercase;
+            background-color: #F4F6F9;
+            margin-top: -40px;
+        }
+        
+        .advanced-search{
+            text-align: right;
+            margin-bottom: 10px;
+        }
+        
+        .advanced-search span{
+            font-family : "Salesforce Sans",Arial,sans-serif;
+            font-size : 14px;
+        }
+        
+        .advanced-search input{
+            width : 200px;
+        }
+        .advance-btn-panel{
+            text-align: right;
+        }
+        
+        .advance-btn-panel button{
+            width: 200px;
+        }
+    </style>
+    <script>
+    
+   jQuery(window).load(function(){
+        var ownerid = '{!Owid}';
+       var Profileid = '{!Profileid1}';
+      
+           if('{!$User.Id}' != '{!owid}'){
+           if('{!$User.ProfileId}' != '{!Profileid1}'){
+        //alert('You are not authorized to perform this task. Please contact the sales order owner');
+        fncShowMessage('Warning', 'You are not authorized to perform this task. Please contact the sales order owner');
+        //sforce.one.back(true);
+        }
+        }
+        });
+         function fncRefreshPage()
+            {
+                if(typeof sforce != 'undefined'&&sforce != null ) {
+                    sforce.one.back(true);
+                    Sfdc.canvas.publisher.publish({name: "publisher.refresh", payload:{ refresh:"true"}});
+                }
+            }
+        
+    (function(){try{var a=navigator.userAgent;
+        if((a.indexOf('Salesforce')!=-1)&&(a.indexOf('iPhone')!=-1||a.indexOf('iPad')!=-1)&&(a.indexOf('OS')!=-1||a.indexOf('OS')!=-1)&&(a.indexOf('Safari')==-1)){
+        var s=document.createElement('style');
+        s.innerHTML="html,html body{overflow: auto;-webkit-overflow-scrolling:touch;}body{position:absolute;left:0;right:0;top:0;bottom:0;}";
+        document.getElementsByTagName('head')[0].appendChild(s);}}catch(e){}})();
+    
+    </script>
+    <script>
+        // This script assists the search bar functionality
+        // It will execute a search only after the user has stopped typing for more than 1 second
+        // To raise the time between when the user stops typing and the search, edit the following variable:
+        
+        var waitTime = 1;
+        var countDown = waitTime+2;
+        var started = false;
+        
+        function resetTimer(){
+        
+            countDown=waitTime+2;
+            
+            if(started==false){
+                started=true;
+                runCountDown();
+            }
+        }
+        
+        function runCountDown(){
+        
+            countDown--;
+            
+            if(countDown<=0){
+                fetchResults();
+                started=false;
+            }
+            else{
+                window.setTimeout(runCountDown,1000);
+            }
+        }
+        
+        
+        //To get the Package Size and Quantity
+        function getProductDetails(priceEntryID){
+            
+            var idPS = 'idPackageSize';
+            var idQT = 'idQuantity';
+            var packageSize = $('#'+idQT + ' input').val();
+            var quantity = $('#'+idPS + ' select').val();
+            
+            //call actionfunction to call action method
+            getPricingDetailsCall(priceEntryID, quantity, packageSize);
+        }
+
+        $( document ).ready(function() {
+            
+        });
+        
+        function selectActionFunction(pricebookentryId){
+            //var txt;
+           // var r = confirm("Press a button!");
+            //if (r == true) {
+            //txt = 
+            selectProduct(pricebookentryId);
+                 var theme ='{!$User.UITheme}';
+            
+               if(theme == 'Theme4t'){
+                sforce.one.back(true);
+                }
+            //} else {
+               // txt = sforce.one.back(true);
+            //}
+            //document.getElementById("demo").innerHTML = txt;
+
+            
+           // var Accountname ='{!SF1Navigation}';
+            
+           
+                
+        }
+        
+        function editOppLineItem(priceBookentryId){
+            editOpportunityLineItem(priceBookentryId);
+        }
+        
+        function deleteOppLineItem(oppLineItem){
+            deleteSalesOrderItem(oppLineItem);
+        }
+        
+        function showPIStatus(){
+            $('#piStatusModal').modal({
+                backdrop : 'static'
+            });
+        }
+        
+        function closeAdvancedSearch(){
+            $("#idAdvancedSearch").hide();
+        }
+    </script>
+    <body class="background">
+<apex:sectionHeader Title="Opportunity Address for {!$ObjectType.Name}" subtitle="{!Opportunity.Name}" rendered="{!NOT($User.UITheme == 'Theme4t')}" />
+<apex:form >
+<div style="display: none;">
+<c:Popup_Alert ></c:Popup_Alert>
+</div>
+<apex:pageblock >
+<div class="">
+        <!-- Product Selection Panel - Starts-->          
+        <apex:outputPanel rendered="{!NOT($User.UITheme == 'Theme4t')}" >
+            <script>
+                function confirmationForProductSelection(){
+                
+                    if('{!JSINHTMLENCODE(confirmUpdateOrInsert)}' == 'true'){
+                        $('#productConfirmationModal').modal({
+                            backdrop : 'static'
+                        });
+                    }
+                }
+            </script>
+
+            <apex:actionStatus id="statusLoader" >
+                <apex:facet name="start" >
+                    <div class="overlay">
+                        <img class="loader" src="/img/loading.gif" />
+                                         
+                    </div>                   
+                </apex:facet>
+            </apex:actionStatus> 
+            <apex:messages styleClass="error-msg"/>
+            <div style="display:{!IF(selectedView == 'ProductSearch' && selectedViewOverride ==  false,'block','none')}">
+               
+    <apex:actionFunction name="selectProduct" action="{!addAddress}" reRender="productSearchPanel" status="statusLoader" immediate="true">
+                    <apex:param value="" assignTo="{!toSelect}" name="toSelect"/>
+                </apex:actionFunction>
+                <apex:actionFunction name="fetchResults" action="{!Testrecords}" reRender="searchResults" status="searchStatus"/>
+
+               </div> 
+                <apex:actionRegion renderRegionOnly="false" immediate="true">
+                
+                                        
+                    <!-- here we invoke the scripting to get out fancy 'no button' search bar to work -->
+                    <apex:outputPanel styleClass="search">
+                    Search for {!$ObjectType.Additional_Address__c.LabelPlural}:&nbsp;<apex:inputText value="{!searchText}" onkeydown="if(event.keyCode==13){this.blur();}else{resetTimer();}" style="width:150px" label="Product Name"/>
+                    </apex:outputPanel> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  
+                     </apex:actionRegion>         
+                    <apex:outputPanel id="searchResults" rendered="{!NOT($User.UITheme == 'Theme4t')}">
+                    <apex:pageBlockTable value="{!Testrecords }" var="a">
+                     <div onclick="selectActionFunction('{!a.Id}')" class="product">
+                        <apex:column headerValue="{!$ObjectType.Additional_Address__c.Fields.Name.Label}" value="{!a.Name}" onclick="selectActionFunction('{!a.Id}')"/>
+                        <apex:column headerValue="{!$ObjectType.Additional_Address__c.Fields.Additional_Address_City__c.Label}" value="{!a.Additional_Address_City__c}" />
+                        <apex:column headerValue="{!$ObjectType.Additional_Address__c.Fields.Additional_Address_Street__c.Label}" value="{!a.Additional_Address_Street__c}" />
+                        <apex:column headerValue="{!$ObjectType.Additional_Address__c.Fields.Additional_Address_Zip_Code__c.Label}" value="{!a.Additional_Address_Zip_Code__c}" />                    
+                        <apex:column headerValue="{!$ObjectType.Additional_Address__c.Fields.Address_Company__c.Label}" value="{!a.Address_Company__c}" />
+                        <apex:column headerValue="{!$ObjectType.Additional_Address__c.Fields.Address_Country__c.Label}" value="{!a.Address_Country__c}" />
+                    </div>
+                    </apex:pageBlockTable>
+                    
+                </apex:outputPanel>
+                    
+             </Apex:outputPanel>
+             </div>   
+                </apex:pageblock>
+                </apex:form>
+                </body>
+   
+   <apex:form >
+   
+                 <!-- Deleviry address Selection Panel - Starts-->          
+        <apex:outputPanel rendered="{!($User.UITheme == 'Theme4t')}" >
+            <script>
+                function confirmationForProductSelection(){
+                
+                    if('{!JSINHTMLENCODE(confirmUpdateOrInsert)}' == 'true'){
+                        $('#productConfirmationModal').modal({
+                            backdrop : 'static'
+                        });
+                    }
+                }
+            </script>
+
+            <apex:actionStatus id="statusLoader" >
+                <apex:facet name="start" >
+                    <div class="overlay">
+                        <img class="loader" src="/img/loading.gif" />
+                                         
+                    </div>                   
+                </apex:facet>
+            </apex:actionStatus> 
+            <apex:messages styleClass="error-msg"/>
+           <div style="display:{!IF(selectedView == 'ProductSearch' && selectedViewOverride ==  false,'block','none')}">
+               
+                <apex:actionFunction name="selectProduct" action="{!addAddress1}" reRender="productSearchPanel" status="statusLoader">
+                    <apex:param value="" assignTo="{!toSelect}" name="toSelect"/>
+                </apex:actionFunction>
+                <apex:actionStatus id="searchStatus" startText="Searching..." stopText=" " startStyleClass="font-actionstatus" styleClass="font-actionstatus" />
+                <apex:actionFunction name="fetchResults" action="{!Testrecords}" reRender="searchResults" status="searchStatus"/>
+           </div>
+                <apex:outputPanel id="searchResults" rendered="{!($User.UITheme == 'Theme4t')}">
+                <apex:inputText styleClass="form-control searchbox" value="{!searchString}" onkeydown="if(event.keyCode==13){this.blur();}else{resetTimer();}" html-placeholder="Search Address" />
+                     <!--apex:commandButton value="Delete Address" styleClass="btn-size" /--->
+                    <apex:repeat value="{!Testrecords }" var="a" >
+                    <div onclick="selectActionFunction('{!a.Id}')" class="product">
+                        
+                        <div class="product-label">
+                            {!a.Name}
+                        </div>
+                            
+                        
+                        <div class="product-value">                                             
+                            {!a.Address_Company__c} | 
+                                                                       
+                            {!a.Additional_Address_City__c} | {!a.Additional_Address_Street__c} | {!a.Additional_Address_Zip_Code__c} | {!a.Address_Country__r.Name} |
+                        </div>                        
+                     </div>    
+                </apex:repeat> 
+                
+                </apex:outputPanel>
+                    
+                </apex:outputPanel>
+      </apex:form> 
+</apex:page>

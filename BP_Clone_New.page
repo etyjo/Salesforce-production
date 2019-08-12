@@ -1,0 +1,41 @@
+<apex:page standardController="Business_Plan__c" extensions="BP_Clone_New_Controller">
+ <apex:messages />
+    <apex:form >
+    <apex:sectionHeader title="Business Plan Edit" subtitle="New Business Plan"/>
+    
+        <apex:pageBlock title="Business Plan Edit" mode="inlineEdit "> 
+            <apex:pageBlockButtons location="both">
+                <apex:commandButton value="Save" action="{!cloneWithItems}"/>
+                <apex:commandButton value="Cancel" immediate="true" action="{!cancel}"/>
+            </apex:pageBlockButtons>
+           
+            <apex:pageBlockSection title="Information" columns="2" collapsible="false" showHeader="true" >
+                <apex:inputField value="{!newPO.Name}"/>
+                <apex:inputField value="{!newPO.Status__c}"/>
+                <apex:inputField value="{!newPO.Account__c}"/>
+                <apex:inputField value="{!newPO.Start_Date__c}"/>
+                <apex:inputField value="{!newPO.Market__c}"/>
+                <apex:inputField value="{!newPO.End_Date__c}"/>
+                <apex:inputField value="{!newPO.CurrencyIsoCode}"/>
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection title="Related Records" columns="2" collapsible="false" showHeader="true" >
+               <apex:pageBlockSectionItem >
+                    <!--<apex:selectList value="{!func}" size="1">-->
+                   <apex:outputLabel >SWOTs</apex:outputLabel>
+                    <apex:selectList value="{!selectedSWOTs}" size="1">
+                        <apex:selectOptions value="{!SelectSWOTs}"/>
+                        <!--<apex:selectOption itemValue="No" itemLabel="No"/>-->
+                    </apex:selectList> 
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <!--<apex:selectList value="{!func}" size="1">-->
+                    <apex:outputLabel >Objective</apex:outputLabel>
+                    <apex:selectList value="{!selectedObjectives}" size="1">
+                        <apex:selectOptions value="{!SelectObjectives}"/>
+                    </apex:selectList> 
+                </apex:pageBlockSectionItem>
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

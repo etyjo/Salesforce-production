@@ -1,0 +1,71 @@
+<apex:page standardController="Case" extensions="SendEmailToCustraThroughCase" >
+    <apex:form >
+        <div style="display: none;">
+        <c:Popup_Alert ></c:Popup_Alert>
+        </div>
+       
+        
+        
+        
+        <apex:pagemessages />
+
+        <script src="/soap/ajax/29.0/connection.js"></script>
+        <script type='text/javascript' src='/canvas/sdk/js/publisher.js'/>
+        <script src="https://mobile1.t.salesforce.com/soap/ajax/30.0/connection.js" type="text/javascript" />
+        <script type="text/javascript">
+ 
+        var refnum="{!JSENCODE(Case.Reference_number__c)}"; 
+        var reftype="{!Case.Reference_Type__c}"; 
+        var noc = "{!Case.Nature_of_Complaint__c}"; 
+        var coc = "{!Case.Cause_of_Complaint__c}"; 
+        var sampc = "{!Case.Sample_taken_from_lot_at_Customer__c}"; 
+        var Desp = "{!JSENCODE(Case.Description)}"; 
+        var lot="{!Case.Lot_number__c}"; 
+        var quantity="{!Case.Quantity__c}"; 
+        var unit="{!(Case.Unit__c)}"; 
+        var afc="{!Case.Attachment_for_Complaint__c}"; 
+        var eca="{!Case.Estimate_Claim_Amount__c}"; 
+        var ccd="{!JSENCODE(Case.Customer_Claim_Details__c)}"; 
+            if (reftype == '' ||refnum == '' || noc == '' || coc == '' || sampc== '' || Desp== '' || lot=='' || quantity=='' || unit=='' || afc=='' || eca=='' || ccd=='') 
+            { 
+            fncShowMessage('Warning', 'Please fill all mandatory data');
+            <!--alert('Please fill all mandatory data');-->
+            } 
+            else{
+                window.onload=function(){
+                    Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.SendEmailToCustraThroughCase.isMatch1}', 
+                        '{!Case.Id}',
+                        function(result, event) {
+                            if (event.status) {
+                                //do whatever rendering of the list you want
+                               fncShowMessage('Success', 'Email sent successfully');
+                                 <!-- alert('Email sent successfully');-->
+                            } 
+                            else if (event.type === 'exception') {
+                                fncShowMessage('Error', 'he is not a owner');
+                                <!--alert('he is not a owner');-->
+                            } 
+                            else {
+                                 fncShowMessage('Error', 'Something went wrong');
+                                <!--alert('Something went wrong.');-->
+                            }
+                            <!--fncRefreshPage();-->
+                        }, 
+                        {escape: true}
+                    );
+                    
+                }
+            }
+            function fncRefreshPage()
+            {
+                if(typeof sforce != 'undefined'&&sforce != null ) {  
+                    sforce.one.back(true);
+                    Sfdc.canvas.publisher.publish({name: "publisher.refresh", payload:{ refresh:"true"}});
+                }
+            }
+            
+        </script>
+
+    </apex:form>
+</apex:page>

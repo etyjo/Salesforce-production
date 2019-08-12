@@ -1,0 +1,16 @@
+<apex:page standardController="Business_Plan__c"  
+     extensions="BP_Deep_Clone_Controller">
+    <apex:pageMessages id="bpForm"/>
+
+    <apex:form >
+       <apex:actionFunction name="cloneWithItems" action="{!cloneWithItems}" /> 
+    </apex:form> 
+    <script>
+       window.onload=function()
+       {
+           var bpId = "{!(po)}";
+           if(bpId != '')
+           cloneWithItems();     
+       };
+    </script>
+</apex:page>

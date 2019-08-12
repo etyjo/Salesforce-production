@@ -1,0 +1,105 @@
+<apex:page sidebar="false" standardController="Location__c" extensions="GeoLocationController" id="pg1">
+    <!-- Uncomment the line below, and include your Google's Maps API key in the script link -->
+    <apex:form style="display:none" id="frm1">
+        <apex:actionFunction name="Jscall" action="{!Cancel}">
+        </apex:actionFunction>
+    </apex:form>
+    
+     <link rel="stylesheet" href="{!URLFOR($Resource.Bootstrap3, '/bootstrap3/css/bootstrap.css')}"/>
+    
+    <apex:includeScript value="{!$Resource.jQUERY_lib}"/>
+    <apex:includeScript value="{!URLFOR($Resource.Bootstrap3, '/bootstrap3/js/jquery.min.js')}"/> 
+     <apex:includeScript value="{!URLFOR($Resource.bootsstrap_box, '/bootbox/bootstrap.js')}"/> 
+     <apex:includeScript value="{!URLFOR($Resource.bootsstrap_box, '/bootbox/bootbox.min.js')}"/> 
+     
+     <!--<apex:includeScript value="{!$Resource.MapsAPI}" />-->
+     <apex:includeScript value="https://maps.googleapis.com/maps/api/js?key={!$Label.APIKey_Maps}"/>
+    
+    <script>
+        var lat,lng;
+        var LocID = '{!LocRecord.id}'
+        $(document).ready(function() 
+        { 
+            console.log("ready!");
+            fncGetLocation();
+        });
+        
+        
+        function fncGetLocation() 
+        {   
+            // Try HTML5 geolocation.
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position){
+                    var pos = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    lat=pos.lat;
+                    lng=pos.lng;
+                    console.log("lat = "+lat);
+                    console.log("lng = "+lng);
+                    
+                    Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.GeoLocationController.UpdatelocationRemotely}',
+                        LocID,lat,lng, 
+                        function(result, event){
+                            if (event.status) {
+
+                                console.log(result);
+                                if(result)
+                                {   if( (typeof sforce != 'undefined') && sforce && (!!sforce.one) ) {
+                                    bootbox.alert("Record Updated Successfully",function() {
+                                    sforce.one.back(true);});
+                                    
+                                    }
+                                    else
+                                    {
+                                    alert("Record Updated Successfully");
+                                    Jscall();
+                                    }
+                                    
+                                 }
+                                else
+                                {   if( (typeof sforce != 'undefined') && sforce && (!!sforce.one) ) {
+                                    bootbox.alert("Oops ! Something Went Wrong",function() {
+                                    sforce.one.back(true);});
+                                    }
+                                    else
+                                    {
+                                    alert("Oops ! Something Went Wrong");
+                                    Jscall();
+                                    }
+                                    
+                                }    
+                                
+                                
+
+                            } else if (event.type === 'exception') {
+
+                            } else {
+
+                            }
+                        }, 
+                        {escape: true}
+                    );
+                    
+                });
+                
+            }
+            else {
+                 if( (typeof sforce != 'undefined') && sforce && (!!sforce.one) ) {
+                 bootbox.alert("Browser doesn't support geolocation",function() {
+                 sforce.one.back(true);});
+                 }
+                else
+                {
+                alert("Browser doesn't support geolocation");
+                Jscall();
+                }
+            }
+        }
+       
+    </script>
+    
+  
+</apex:page>

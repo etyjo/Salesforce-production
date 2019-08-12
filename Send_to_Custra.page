@@ -1,0 +1,70 @@
+<apex:page standardController="Opportunity" extensions="emailOperations">
+
+    <apex:form >
+        <div style="display: none;">
+        <c:Popup_Alert ></c:Popup_Alert>
+        </div>
+        <apex:pagemessages />
+
+        <script src="/soap/ajax/29.0/connection.js"></script>
+        <script type='text/javascript' src='/canvas/sdk/js/publisher.js'/>
+        <script src="https://mobile1.t.salesforce.com/soap/ajax/30.0/connection.js" type="text/javascript" />
+        <script type="text/javascript">
+      
+            var owner = '{!owid}';
+            var profile ='{!Profileid1}';
+                //alert('{!profileId1}');    
+                
+            if('{!$User.profileId}' == '{!Profileid1}' || '{!$User.Id}' == '{!owid}'){ 
+                window.onload=function(){
+                    Visualforce.remoting.Manager.invokeAction(
+                        '{!$RemoteAction.emailOperations.sendEmailSF1}', 
+                        '{!Opportunity.Id}',
+                        function(result, event) {
+                            if (event.status) {
+                                //do whatever rendering of the list you want
+                                //fncShowMessage('Success', 'Email sent successfully');
+                                
+                                alert('Email sent successfully !');
+                                sforce.one.back(false);
+                            } 
+                            else if (event.type === 'exception') {
+                                 //fncShowMessage('Error', 'he is not a owner');
+                                alert('he is not a owner');
+                                sforce.one.back(false);
+                            }
+                            else {
+                                //fncShowMessage('Error', 'Something went wrong');
+                                alert('Something went wrong.');
+                                sforce.one.back(false);
+                            }
+                            /*
+                            if(result == true){
+                                alert('he is not a owner');                             
+                            }
+                            */
+                            //fncRefreshPage();
+                        }, 
+                        {escape: true}
+                    );
+                }
+            }
+            else{
+                fncShowMessage('Warning', 'You are not authorized to perform this task. Please contact the sales order owner');
+                //alert('You are not authorized to perform this task. Please contact the sales order owner');
+                //sforce.one.back(true);  
+            }
+            
+            function fncRefreshPage()
+            {
+                if(typeof sforce != 'undefined'&&sforce != null ) {
+                    sforce.one.back(true);
+                    Sfdc.canvas.publisher.publish({name: "publisher.refresh", payload:{ refresh:"true"}});
+                }
+            }
+
+        </script>
+
+    </apex:form>
+
+</apex:page>

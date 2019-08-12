@@ -1,0 +1,8 @@
+<apex:page standardController="Case" >
+    <c:accountTeamAuthorization queryStringForObject="select id, AccountId, Account.OwnerId from Case" 
+                                accountFieldNameForAccount="AccountId"
+                                objectNameForNavigation="Case"
+                                parentFieldIdId="def_account_id"
+                                queryStringForOwner="select id, OwnerId from Account"
+                                checkforOwnership="false" />                                   
+</apex:page>

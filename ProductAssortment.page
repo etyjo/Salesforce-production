@@ -1,0 +1,119 @@
+<apex:page standardController="account" extensions="productAssortment" showHeader="true" sidebar="True">
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<apex:includeScript value="{!$Resource.jQuery}" />
+<style>
+Assortment.style {
+    hight: 20px;
+}
+</style>
+<script type='text/javascript'>
+        // This script assists the search bar functionality
+        // It will execute a search only after the user has stopped typing for more than 1 second
+        // To raise the time between when the user stops typing and the search, edit the following variable:
+        
+        var waitTime = 1;
+        
+    
+        var countDown = waitTime+1;
+        var started = false;
+        
+        function resetTimer(){
+        
+            countDown=waitTime+1;
+            
+            if(started==false){
+                started=true;
+                runCountDown();
+            }
+        }
+        
+        function runCountDown(){
+        
+            countDown--;
+            
+            if(countDown<=0){
+                fetchResults();
+                started=false;
+            }
+            else{
+                window.setTimeout(runCountDown,1000);
+            }
+        }
+      </script>
+<apex:sectionHeader Title="Account Assortment for {!$ObjectType.Name}" subtitle="{!account.Name}"/>
+<apex:form >
+<apex:pageblock >
+<!---<apex:outputPanel>
+                    Search for {!$ObjectType.Product2.LabelPlural}:
+    </apex:outputPanel> 
+<apex:outputPanel>
+    SfStDescription :
+    </apex:outputPanel>  --> 
+
+                <apex:actionRegion renderRegionOnly="false" immediate="true">
+                
+                    <apex:actionFunction name="fetchResults" action="{!updateAvailableList}" reRender="searchResults" status="searchStatus"/>
+                    
+                    <!-- here we invoke the scripting to get out fancy 'no button' search bar to work -->
+                    <apex:outputPanel styleClass="search">
+                    Search for {!$ObjectType.Product2.LabelPlural}:&nbsp;<apex:inputText value="{!searchText}" onkeydown="if(event.keyCode==13){this.blur();}else{resetTimer();}" style="width:130px" label="Product Name"/>
+                    </apex:outputPanel> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    
+                    <apex:outputLabel styleClass="search">                        
+                     Assortment Type:&nbsp; <apex:selectList size="1" value="{!selectedAssortmentType}" onchange="fetchResults();" style="width:100px" >
+                      <apex:selectOptions value="{!AssortmentTypelist}"/>
+                    </apex:selectList>                                 
+                    </apex:outputLabel> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    
+                    <apex:outputPanel styleClass="search">
+                    Type Code:&nbsp; <apex:inputText title="searchTextTypeName" value="{!searchTextTypeName}" onkeydown="if(event.keyCode==13){this.blur();}else{resetTimer();}" style="width:120px" label="test"/>
+                    </apex:outputPanel>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  
+                    
+                    <apex:outputLabel styleClass="search">                        
+                    Variety Name:&nbsp; <apex:inputText title="searchTextTypeName" value="{!searchTextVarietyName}" onkeydown="if(event.keyCode==13){this.blur();}else{resetTimer();}" style="width:120px" label="test"/>                                  
+                    </apex:outputLabel> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    
+                    <apex:outputPanel styleClass="search">
+                    SF/ST Description:&nbsp;<apex:inputText value="{!searchTextSfStDescription}" onkeydown="if(event.keyCode==13){this.blur();}else{resetTimer();}" style="width:120px"/>
+                    </apex:outputPanel>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;                                                
+                    
+                    
+                   
+                    
+                    <i>
+                        <!-- actionStatus component makes it easy to let the user know when a search is underway -->
+                        <apex:actionStatus id="searchStatus" startText="searching..." stopText=" "/>
+                        <apex:actionStatus id="addProductStatus" startText="Adding product..." stopText=" "/>
+                    </i>
+                    
+                </apex:actionRegion>
+            
+                <br/>
+                <br/>
+            
+                <apex:outputPanel id="searchResults">
+                
+                    <apex:pageBlockTable value="{!lstProduct2}" var="a">
+                        
+                        
+                        <apex:column headerValue="{!$ObjectType.Product2.Fields.Variety_Name__c.Label}" value="{!a.Variety_Name__r.Name}"/>
+                        
+                        <apex:column headerValue="{!$ObjectType.Product2.Fields.SF_ST_Description__c.Label}" value="{!a.SF_ST_Description__c}"/>
+                        
+                        <apex:column headerValue="{!$ObjectType.Product2.Fields.Seed_Size_Description__c.Label}" value="{!a.Seed_Size_Description__c}"/>
+                        
+                        <apex:column headerValue="{!$ObjectType.Product2.Fields.Crop_Code__c.Label}" value="{!a.Crop_Code__c}"/>
+                        
+                        <apex:column headerValue="{!$ObjectType.Product2.Fields.Assortment_Type__c.Label}" value="{!a.Assortment_Type__c}"/>
+                        
+                        <apex:column headerValue="{!$ObjectType.Product2.Fields.Type_Code__c.Label}" value="{!a.Type_Code__c}"/>
+                        
+                        <apex:column headerValue="{!$ObjectType.Product2.Fields.Name.Label}" value="{!a.Name}" />
+                       
+                        
+                    </apex:pageBlockTable>
+                    
+                </apex:outputPanel>
+                </apex:pageblock>
+                </apex:form>
+</apex:page>

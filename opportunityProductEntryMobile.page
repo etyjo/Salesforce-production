@@ -1,0 +1,968 @@
+<apex:page standardController="Opportunity" extensions="opportunityProductEntryExtensionMobile" standardStylesheets="false" sidebar="false" showHeader="false">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <apex:stylesheet value="{!URLFOR($Resource.bootstrap, '/bootstrap-3.3.6-dist/css/bootstrap.min.css')}"/> 
+    <!--<apex:stylesheet value="{!URLFOR($Resource.bootstrap, '/bootstrap-3.3.6-dist/css/icons.css')}"/> 
+    <apex:stylesheet value="{!URLFOR($Resource.bootstrap, '/bootstrap-3.3.6-dist/css/styles.css')}"/> 
+    <apex:stylesheet value="{!URLFOR($Resource.bootstrap, '/bootstrap-3.3.6-dist/css/OneStarter.css')}"/>-->
+    
+    <apex:includeScript value="{!$Resource.jQuery}" />
+    <apex:includeScript value="{!URLFOR($Resource.bootstrap, '/bootstrap-3.3.6-dist/js/bootstrap.min.js')}"/>
+    <!--<apex:includeScript value="{!URLFOR($Resource.bootstrap, '/bootstrap-3.3.6-dist/js/jquery.touchSwipe.min.js')}"/>
+    <apex:includeScript value="{!URLFOR($Resource.bootstrap, '/bootstrap-3.3.6-dist/js/jquery.onestarter.js')}"/>-->
+    <style>
+        .background{
+            background-color: #F4F6F9;
+            font-family: "ProximaNovaSoft-Regular", Calibri,
+            "Gill Sans", "Gill Sans MT", Candara, Segoe,
+            "Segoe UI", Arial, sans-serif;  
+        }
+        
+        .font-label{
+            color: #464646;
+        }
+        .font-value{
+            color: #485E7F;
+        }
+        
+        .font-header1{
+            color: #70809B;
+        }
+        
+        .font-header1{
+            color: #70809B;
+        }
+        
+        .font-header2{
+            color: #7989A6;
+        }
+        
+        .font-actionstatus{
+            font-size : 15px;
+        }
+        
+        .product{
+            padding: 15px;
+            border-bottom: 1px solid #D8DDE6;
+            background-color: #FFF;
+        }
+        
+        .product> .product-label{
+            color: #464646;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .product > .product-value{
+            color: #485E7F;
+            font-size: 14px;
+            font-weight: 500;   
+        }
+        
+        .field-row{
+            background-color: #FFF;
+        }
+        .field-row span, .field-row div{
+            font-weight: 400;
+            font-weight: normal;
+            font-style: normal;
+            font-size: 18px;
+            color: #54698D;
+        }
+        
+        .field-row input, .field-row select{
+            border: 1px solid #D8DDE6; /* #1589EE;*/
+            box-shadow: 0px 0px 0px;
+            height: 41px;
+        }
+        
+        .field-row > .row{
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+        
+        .btn-row{
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        .btn-size{
+            width: 100%;
+            font-size: 16px;
+            line-height: 34px;
+        }
+        
+        .btn-size-small{
+            width: 100%;
+            font-size: 16px;
+            line-height: 24px;
+        }
+        .btn-cancel{
+            color: #005FB2 !important;
+            border : 1px solid #D8DDE6 !important;
+            background-color : #F4F6F9 !important;
+        }
+        
+        .btn-save{
+            background-color : #005FB2;
+            border : 1px solid #0070D2 !important;
+            color : #fff !important;
+        }
+        .searchbox{
+            height: 45px !important;
+            margin-bottom : 10px;
+        } 
+        
+        .loading {
+            position: fixed;
+            z-index: 999;
+            height: 4696px;
+            width: 100%;
+            overflow: show;
+            margin: auto;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            opacity: 0.3;
+            background-color: gray;
+        }
+
+        .overlay{
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: #7E8C99;
+            z-index: 1800;
+            min-height: 100%;
+            width: 100%;
+            overflow: show;
+
+            opacity: 0.8;
+            height: 4696px;
+            display: block;
+        }
+        
+        .loader{
+            display: flex;
+            margin: auto;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+        }
+        
+        .opportunity{
+            text-align : center;
+        }
+        
+        .opportunity > .head{
+            color: #02325C;
+            font-size: 24px;
+        }
+        
+        .opportunity > .body{
+            color: #54698D;
+            font-size:16px;
+        }
+        
+        .dot{
+            border-radius: 3px;
+            height: 6px;
+            width: 6px;
+            background-color: #54698D;
+            display: inline-block;
+            margin-bottom: 2px;
+            margin-left: 5px;
+            margin-right: 5px;
+        }
+        
+        .opportunity > .logo{
+            background-image: url(/img/icon/t4v35/standard/opportunity_120.png);
+            height: 50px;
+            width: 50px;
+            background-size: 50px;
+            background-color: #FCB95B;
+            background-repeat: no-repeat;
+            border-radius: 4px;
+            margin: auto;
+        }
+        
+        .opp-lineitem{
+            padding: 15px;
+            border-bottom: 1px solid #D8DDE6;
+            background-color: #FFF;
+        }
+        
+        .opp-lineitem .title{
+            padding: 16px;
+            color: #16325C;
+            font-weight: 400;
+            line-height : 0px;
+        }
+        .opp-lineitem .head{
+            color: #54698D;
+            font-size: 14px;
+            font-weight: 400;
+            line-height : 19.25px;
+            
+            display: inline-block;
+            white-space: nowrap;
+            overflow: hidden !important;
+            text-overflow: ellipsis;
+        }
+        
+        .opp-lineitem .value{
+
+            color: #16325C;
+            font-size: 14px;
+            font-weight: 400;
+            line-height : 19.25px;
+        }
+        
+        .opp-lineitem-edit{
+            color: #4bca81;
+            font-size: 13px;
+            padding-right : 7px;
+        }
+        
+        .opp-lineitem-delete{
+            color: #d4504c;
+            font-size: 13px;
+            padding-right : 7px;
+        }
+        /*.opp-lineitem > .head > .sub-head{
+            font-size:12px;
+            font-weight:bold;
+            padding-left: 5px;
+            margin-botton: 2px;
+        }*/
+        
+        .tag{
+            color : #0070D2;
+            font-size : 12px;
+            font-weight: bold; 
+        }
+        
+        .pistatus-error{
+            float: right;
+            color: #d4504c !important;
+            cursor: pointer;
+        }
+        
+        .pistatus-success{
+            float: right;
+            color: #4bca81 !important;
+            cursor: pointer;
+        }
+        
+        .cuf-content{
+            padding: 0px !important;
+        }
+        
+        @media only screen 
+          and (min-device-width: 414px) 
+          and (max-device-width: 736px) 
+          and (-webkit-min-device-pixel-ratio: 3)
+          and (orientation: portrait){ 
+
+
+            .forceChatterAlohaPagePost .pageWrapper{
+                padding: 0px !important;
+            }
+            
+            .forceChatterAlohaPagePost .pageWrapper, body{
+                margin: 0px !important;
+                padding: 0px !important;
+            }
+            
+            .forceChatterPublisherPresentationMobile .titleBar + .cuf-content{
+                padding-top : 0px !important;
+            }
+            .forceChatterPublisherPresentationMobile .cuf-content {
+                box-sizing: border-box;
+                height: 0%;
+            }
+        }
+        
+        @media only screen 
+          and (min-device-width: 320px) 
+          and (max-device-width: 568px)
+          and (-webkit-min-device-pixel-ratio: 2)
+          and (orientation: portrait) {
+          
+          .forceChatterAlohaPagePost .pageWrapper{
+                padding: 0px !important;
+            }
+            
+            .forceChatterAlohaPagePost .pageWrapper, body{
+                margin: 0px !important;
+                padding: 0px !important;
+            }
+            
+            .forceChatterPublisherPresentationMobile .titleBar + .cuf-content{
+                padding-top : 0px !important;
+            }
+            .forceChatterPublisherPresentationMobile .cuf-content {
+                box-sizing: border-box;
+                height: 0%;
+            }
+            .forceChatterAlohaPagePost .pageWrapper{
+                margin: 0px !important;
+                padding: 0px !important;
+            }
+          
+        }
+        
+        
+        .forceChatterAlohaPagePost .pageWrapper{
+            margin: 0px !important;
+            padding: 0px !important;
+        }
+        /*--vertically align center--*/
+        .modal-dialog {
+            height: 80% !important;
+            padding-top:10%;
+        }
+        
+        .modal-content {
+            /*height: 100% !important;*/
+            overflow:visible;
+        }
+        
+        .modal-body {
+            height: 80%;
+            overflow: auto;
+        }
+        
+        .error-msg{
+            color: red;
+            padding-top: 10px;
+        }
+        
+        .screen-title{
+            color: #54698D;
+            font-family : "Salesforce Sans",Arial,sans-serif;
+            font-size : 14px;
+            font-weight: 400;
+            line-height: 17.5px;
+            margin-bottom: 7px;
+            padding-bottom: 8px;
+            padding-left: 16px;
+            padding-right: 16px;
+            padding-top: 8px;
+            text-transform: uppercase;
+            background-color: #F4F6F9;
+            margin-top: -40px;
+        }
+        
+        .advanced-search{
+            text-align: right;
+            margin-bottom: 10px;
+        }
+        
+        .advanced-search span{
+            font-family : "Salesforce Sans",Arial,sans-serif;
+            font-size : 14px;
+        }
+        
+        .advanced-search input{
+            width : 200px;
+        }
+        .advance-btn-panel{
+            text-align: right;
+        }
+        
+        .advance-btn-panel button{
+            width: 200px;
+        }
+    </style>
+    <script>
+    (function(){try{var a=navigator.userAgent;
+        if((a.indexOf('Salesforce')!=-1)&&(a.indexOf('iPhone')!=-1||a.indexOf('iPad')!=-1)&&(a.indexOf('OS')!=-1||a.indexOf('OS')!=-1)&&(a.indexOf('Safari')==-1)){
+        var s=document.createElement('style');
+        s.innerHTML="html,html body{overflow: auto;-webkit-overflow-scrolling:touch;}body{position:absolute;left:0;right:0;top:0;bottom:0;}";
+        document.getElementsByTagName('head')[0].appendChild(s);}}catch(e){}})();
+    
+    </script>
+    <script>
+        // This script assists the search bar functionality
+        // It will execute a search only after the user has stopped typing for more than 1 second
+        // To raise the time between when the user stops typing and the search, edit the following variable:
+        
+        var waitTime = 1;
+        var countDown = waitTime+1;
+        var started = false;
+        
+        function resetTimer(){
+        
+            countDown=waitTime+1;
+            
+            if(started==false){
+                started=true;
+                runCountDown();
+            }
+        }
+        
+        function runCountDown(){
+        
+            countDown--;
+            
+            if(countDown<=0){
+                fetchResults();
+                started=false;
+            }
+            else{
+                window.setTimeout(runCountDown,1000);
+            }
+        }
+        
+        
+        //To get the Package Size and Quantity
+        function getProductDetails(priceEntryID){
+            
+            var idPS = 'idPackageSize';
+            var idQT = 'idQuantity';
+            var packageSize = $('#'+idQT + ' input').val();
+            var quantity = $('#'+idPS + ' select').val();
+            
+            //call actionfunction to call action method
+            getPricingDetailsCall(priceEntryID, quantity, packageSize);
+        }
+
+        $( document ).ready(function() {
+            
+        });
+        
+        function selectActionFunction(pricebookentryId){
+            selectProduct(pricebookentryId);
+        }
+        
+        function editOppLineItem(priceBookentryId){
+            editOpportunityLineItem(priceBookentryId);
+        }
+        
+        function deleteOppLineItem(oppLineItem){
+            deleteSalesOrderItem(oppLineItem);
+        }
+        
+        function showPIStatus(){
+            $('#piStatusModal').modal({
+                backdrop : 'static'
+            });
+        }
+        
+        function closeAdvancedSearch(){
+            $("#idAdvancedSearch").hide();
+        }
+    </script>
+    <body class="background">
+    <apex:form >
+    <div class="">
+        <!-- Product Selection Panel - Starts-->          
+        <apex:outputPanel id="productSearchPanel">
+            <script>
+                function confirmationForProductSelection(){
+                
+                    if('{!JSINHTMLENCODE(confirmUpdateOrInsert)}' == 'true'){
+                        $('#productConfirmationModal').modal({
+                            backdrop : 'static'
+                        });
+                    }
+                }
+            </script>
+            <apex:actionStatus id="statusLoader" >
+                <apex:facet name="start" >
+                    <div class="overlay">
+                        <img class="loader" src="/img/loading.gif" />
+                                         
+                    </div>                   
+                </apex:facet>
+            </apex:actionStatus> 
+            <apex:messages styleClass="error-msg"/>
+            <div style="display:{!IF(selectedView == 'ProductSearch' && selectedViewOverride ==  false,'block','none')}">
+                
+                <apex:actionFunction name="selectProduct" action="{!addToShoppingCartMobile}" reRender="productSearchPanel" status="statusLoader" immediate="true">
+                    <apex:param value="" assignTo="{!toSelect}" name="toSelect"/>
+                </apex:actionFunction>
+                <div>
+                    <apex:actionRegion >
+                        <apex:outputPanel id="idAdvancedSearch">
+                            <apex:inputText styleClass="form-control searchbox" value="{!searchString}" onkeydown="if(event.keyCode==13){this.blur();}else{resetTimer();}" html-placeholder="Search Product"/>
+                            <div class="advanced-search">
+                                <apex:outputPanel rendered="{!!showAdvanceSearch}">
+                                    <apex:commandlink action="{!advancedSearch}" value="Advanced Search" rerender="idAdvancedSearch,searchResults" />
+                                    <apex:commandlink action="{!clearSearch}" value="Clear Search" rerender="idAdvancedSearch,searchResults" style="margin-left: 20px;" /><br/>
+                                    <span style="text-align: right;font-size:10px">Assortment: {!selectedAssortmentType}, Type: {!searchTextTypeName}, Variety: {!searchTextVarietyName}, SF/ST: {!searchTextSfStDescription}</span>
+                                </apex:outputPanel>
+                            </div>
+                            
+                            <div  style="display:{!IF(showAdvanceSearch=true,'block','none')}">
+                                <apex:selectList styleClass="form-control searchbox" size="1" value="{!selectedAssortmentType}" html-placeholder="Assortment Type">
+                                    <apex:selectOptions value="{!AssortmentTypelist}"/>
+                                </apex:selectList>
+                        
+                                <apex:inputText styleClass="form-control searchbox" value="{!searchTextTypeName}" html-placeholder="Type Code"/>
+                                
+                                <apex:inputText styleClass="form-control searchbox" value="{!searchTextVarietyName}" html-placeholder="Variety Name"/>
+                                
+                                <apex:inputText styleClass="form-control searchbox" value="{!searchTextSfStDescription}" html-placeholder="SF/ST Description"/>
+                                
+                                <div class="advance-btn-panel">
+                                    <apex:commandButton action="{!updateAvailableList}" value="Search" styleClass="btn btn-size btn-save" reRender="idAdvancedSearch,productSearchPanel" status="statusLoader" >
+                                        <apex:param assignTo="{!showAdvanceSearch}" name="showAdvanceSearch" value="false"/>
+                                    </apex:commandButton>
+                                    <!--<button class="btn btn-size btn-save" onclick="fetchResults();closeAdvancedSearch();return false;">Search</button>-->
+                                </div>
+                            </div>
+                        </apex:outputPanel>
+
+                        
+                        <apex:actionStatus id="searchStatus" startText="Searching..." stopText=" " startStyleClass="font-actionstatus" styleClass="font-actionstatus" />
+                        <apex:actionFunction name="fetchResults" action="{!updateAvailableList}" reRender="productSearchPanel" status="searchStatus" />
+                    </apex:actionRegion>
+                </div>
+                
+                <apex:outputPanel id="searchResults">
+                <apex:repeat value="{!AvailableProducts}" var="a" rendered="{!NOT(showAdvanceSearch)}">
+                    <div onclick="selectActionFunction('{!a.Id}')" class="product">
+                        
+                        <div class="product-label">
+                           {!a.Product2.Variety_Name__r.Name} 
+                        </div>
+                            
+                        
+                        <div class="product-value">                      
+                           {!a.Product2.SF_ST_Description__c} |
+                                                
+                            {!a.Product2.Seed_Size_Description__c} | {!a.Product2.Crop_Code__c} | {!a.Product2.Assortment_Type__c} | {!a.Product2.Type_Code__c} | {!a.Product2.Name} 
+                        </div>                        
+                    </div>    
+                </apex:repeat> 
+                <div class="product" style="display:{!IF(AvailableProducts.size == 0,'block','none')};color:#d4504c;">
+                    No product available for the current selection!
+                </div>   
+                </apex:outputPanel>
+
+            </div>
+            
+            <!-- Product Selection Panel - Ends-->           
+            
+            <!-- Opportunity Line Item creation Panel - Starts-->
+            <div style="display:{!IF(selectedView == 'OpportunityLineCreation','block','none')}">
+                <apex:actionFunction action="{!getPricingDetails}" name="getPricingDetailsCall" status="statusLoader" reRender="productSearchPanel">
+                    <apex:param value="" assignTo="{!productId}" name="productId"/>
+                    <apex:param value="" assignTo="{!tempPackageSize}" name="tempPackageSize"/>
+                    <apex:param value="" assignTo="{!tempQuantity}" name="tempQuantity"/>
+                </apex:actionFunction>
+                <div class="field-row">
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <span>{!$ObjectType.Product2.Label}</span>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <span class="oppline-input-label">{!shoppingCartItem.PriceBookEntry.Product2.Name}</span>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <span>{!$ObjectType.OpportunityLineItem.Fields.SF_ST_Description__c.Label}</span>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <span>{!shoppingCartItem.PriceBookEntry.Product2.SF_ST_Description__c}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <span>{!$ObjectType.OpportunityLineItem.Fields.Seed_Size_Description__c.Label}</span>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <span>{!shoppingCartItem.PriceBookEntry.Product2.Seed_Size_Description__c}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <span>{!$ObjectType.OpportunityLineItem.Fields.Quantity.Label}</span>
+                        </div>
+                        <div id="idQuantity" class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <apex:inputField value="{!shoppingCartItem.Quantity}" styleClass="form-control" required="true" onblur="getProductDetails('{!shoppingCartItem.PriceBookEntryId}');"/>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <span>{!$ObjectType.OpportunityLineItem.Fields.Package_Size__c.Label}</span>
+                        </div>
+                        <div id="idPackageSize" class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <div id="ps{!shoppingCartItem.PriceBookEntryId}">
+                                <apex:selectList styleClass="form-control" value="{!shoppingCartItem.Package_Size__c}" rendered="{!IF(shoppingCartItem != null,true,false)}" required="false" multiselect="false" size="1" onchange="getProductDetails('{!shoppingCartItem.PriceBookEntryId}');">
+                                    <apex:selectOptions value="{!mapPackageSize[shoppingCartItem.PriceBookEntryId]}"></apex:selectOptions>
+                                </apex:selectList>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <span>{!$ObjectType.OpportunityLineItem.Fields.Number_of_Packages__c.Label}</span>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">    
+                            <apex:inputField styleClass="form-control" value="{!shoppingCartItem.Number_of_Packages__c}" required="false" />
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <span>{!$ObjectType.OpportunityLineItem.Fields.Package_Layout__c.Label}</span>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">    
+                            <apex:inputField styleClass="form-control" value="{!shoppingCartItem.Package_Layout__c}" required="false" />
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <span>{!$ObjectType.OpportunityLineItem.Fields.Picture_Label__c.Label}</span>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">    
+                            <apex:inputField value="{!shoppingCartItem.Picture_Label__c}" styleClass="form-control" required="false" />
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <span>{!$ObjectType.Opportunity.Fields.Sales_Order_Currency__c.Label}</span>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">    
+                            <apex:inputField value="{!Opportunity.Sales_Order_Currency__c}" required="false" />
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <span>{!$ObjectType.OpportunityLineItem.Fields.UnitPrice.Label}</span>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">    
+                            <apex:outputField value="{!shoppingCartItem.UnitPrice}" rendered="{!IF(shoppingCartItem.Id != null, true, false)}" />
+                            <div style="display:{!IF(shoppingCartItem.Id != null, 'none', 'block')}">{!Opportunity.Sales_Order_Currency__c} {!shoppingCartItem.UnitPrice}</div>
+                            <apex:outputPanel rendered="{!piStatus.status == 'Failure'}">
+                                <span class="glyphicon glyphicon-remove-circle pistatus-error" onclick="showPIStatus();"/>
+                            </apex:outputPanel>
+                            <apex:outputPanel rendered="{!piStatus.status == 'Success'}">
+                                <span class="glyphicon glyphicon-ok-circle pistatus-success" onclick="showPIStatus();"/>
+                            </apex:outputPanel>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <span>{!$ObjectType.OpportunityLineItem.Fields.Sales_Price_UOM__c.Label}</span>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">    
+                            <apex:outputText value="{!shoppingCartItem.Sales_Price_UOM__c}" />
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <span>{!$ObjectType.OpportunityLineItem.Fields.Operator__c.Label}</span>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">    
+                            <apex:inputField styleClass="form-control" value="{!shoppingCartItem.Operator__c}" required="false" />
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <span>{!$ObjectType.OpportunityLineItem.Fields.Discount_Value__c.Label}</span>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">    
+                            <apex:inputField styleClass="form-control" value="{!shoppingCartItem.Discount_Value__c}" required="false" />
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <span>{!$ObjectType.OpportunityLineItem.Fields.Monetary_Discount__c.Label}</span>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">    
+                            <apex:inputField value="{!shoppingCartItem.Monetary_Discount__c}" required="false" />
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <span>{!$ObjectType.OpportunityLineItem.Fields.Actual_Sales_Price__c.Label}</span>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">    
+                            <apex:inputField value="{!shoppingCartItem.Actual_Sales_Price__c}" required="false" />
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <span>{!$ObjectType.OpportunityLineItem.Fields.Sales_Amount__c.Label}</span>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">    
+                            <apex:inputField value="{!shoppingCartItem.Sales_Amount__c}" required="false" />
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                            <span>{!$ObjectType.OpportunityLineItem.Fields.Remarks__c.Label}</span>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">    
+                            <apex:inputField styleClass="form-control" value="{!shoppingCartItem.Remarks__c}" required="false" />
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+                
+                <div>
+                    <div class="row btn-row">
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            <apex:commandButton action="{!onSaveMobile}" reRender="productSearchPanel" status="statusLoader" value="Save" styleClass="btn btn-size btn-save" oncomplete="confirmationForProductSelection()"/>
+                        </div>
+
+                        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                            <apex:commandButton action="{!onCancelMobile}" value="Cancel" styleClass="btn btn-size btn-cancel" reRender="productSearchPanel" status="statusLoader" immediate="true"  />
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+            <!-- Opportunity Line Item creation Panel - Ends-->
+            
+            
+            <!-- Sales Order Overview  - Starts-->
+            <div style="display:{!IF(selectedView == 'SalesOrderOverview' || (selectedView == 'ProductSearch' && selectedViewOverride == true),'block','none')}">
+
+                <div class="opportunity">
+                    <div class="logo"/>
+                    <div class="head">
+                        {!theOpp.Name} 
+                    </div>   
+                    <div class="body">                     
+                        {!theOpp.Account.Name} <div class="dot"/> <apex:outputField value="{!theOpp.Closedate}"/> <div class="dot"/> <apex:outputField value="{!theOpp.Order_Sales_Amount__c}" />
+                    </div>
+                </div>
+                <div>
+                    <apex:repeat value="{!shoppingCart}" var="item">
+                        <div class="opp-lineitem">
+                            <div class="row title">
+                                {!item.PriceBookEntry.Product2.Name}
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 head">
+                                    {!$ObjectType.OpportunityLineItem.Fields.SF_ST_Description__c.Label} : 
+                                </div>
+                                
+                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 value">
+                                    {!item.PriceBookEntry.Product2.SF_ST_Description__c}
+                                </div>
+                            </div>    
+                            <div class="row">    
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 head">
+                                    {!$ObjectType.OpportunityLineItem.Fields.Seed_Size_Description__c.Label} : 
+                                </div>
+                                
+                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 value">
+                                    {!item.PriceBookEntry.Product2.Seed_Size_Description__c}
+                                </div>
+                            </div>
+                                
+                            <div class="row">
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 head">
+                                    {!$ObjectType.OpportunityLineItem.Fields.Quantity.Label} 
+                                </div>
+                                
+                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 value">
+                                    {!item.Quantity}
+                                </div>
+                            </div>
+                                
+                            <div class="row">
+                                
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 head">
+                                    {!$ObjectType.OpportunityLineItem.Fields.Package_Size__c.Label} : 
+                                </div>
+                                
+                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 value">
+                                    {!item.Package_Size__c}
+                                </div>
+                            </div>
+                            <div class="row">
+                                
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 head">
+                                    {!$ObjectType.OpportunityLineItem.Fields.Number_of_Packages__c.Label} : 
+                                </div>
+                                
+                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 value">
+                                    {!item.Number_of_Packages__c}
+                                </div>
+                            </div>
+                                
+                            <div class="row">
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 head">
+                                    {!$ObjectType.OpportunityLineItem.Fields.UnitPrice.Label} : 
+                                </div>
+                                
+                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 value">
+                                    {!item.UnitPrice}
+                                    
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 head">
+                                    {!$ObjectType.OpportunityLineItem.Fields.Sales_Price_UOM__c.Label} : 
+                                </div>
+                                
+                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 value">
+                                    {!item.Sales_Price_UOM__c}
+                                    
+                                </div>
+                            </div>
+                                
+                            <div class="row">
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 head">
+                                    {!$ObjectType.OpportunityLineItem.Fields.Operator__c.Label} : 
+                                </div>
+                                
+                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 value">
+                                    {!item.Operator__c}
+                                </div>
+                            </div>
+                                
+                            <div class="row">
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 head">
+                                    {!$ObjectType.OpportunityLineItem.Fields.Discount_Value__c.Label} : 
+                                </div>
+                                
+                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 value">
+                                    {!item.Discount_Value__c}
+                                </div>
+                            </div>
+                                
+                            <div class="row">
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 head">
+                                    {!$ObjectType.OpportunityLineItem.Fields.Actual_Sales_Price__c.Label} : 
+                                </div>
+                                
+                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 value">
+                                    {!item.Actual_Sales_Price__c}
+                                </div>
+                            </div>
+                                
+                            <div class="row">
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 head">
+                                    {!$ObjectType.OpportunityLineItem.Fields.Sales_Amount__c.Label} : 
+                                </div>
+                                
+                                <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 value">
+                                    {!item.Sales_Amount__c}
+                                </div>
+                            </div>
+                            <div class="row" style="padding-top : 5px;">
+                                <div  class="col-lg-6 col-md-6 col-sm-6 col-xs-6">  
+                                    <button class="btn btn-size-small btn-cancel" type="button" onclick="editOppLineItem('{!item.Id}')"><span class="glyphicon glyphicon-pencil opp-lineitem-edit"/> Edit </button>
+                                </div>
+                                <div  class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                                     <button class="btn btn-size-small btn-cancel" type="button" onclick="deleteOppLineItem('{!item.Id}')"><span class="glyphicon glyphicon-trash opp-lineitem-delete"/> Delete </button>
+                                </div>
+                            </div>
+                        </div>
+                    </apex:repeat>
+                    
+                    <apex:actionFunction action="{!editOpportunityLineItemMobile}" name="editOpportunityLineItem" rerender="productSearchPanel" status="statusLoader" immediate="true">
+                        <apex:param value="" assignTo="{!toSelect}" name="toSelect"/>
+                    </apex:actionFunction>
+                    
+                    <apex:actionFunction action="{!removeFromShoppingCartMobile}" name="deleteSalesOrderItem" rerender="productSearchPanel" status="statusLoader" immediate="true">
+                        <apex:param value="" assignTo="{!toUnselect}" name="toUnselect"/>
+                    </apex:actionFunction>
+
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <apex:commandButton styleClass="btn btn-size btn-row btn-save" value="Add more Products" action="{!navigateToSearchPanel}" rerender="productSearchPanel" status="statusLoader" immediate="true"/>
+                    </div>
+
+                </div>
+
+            </div>
+            <!-- Sales Order Overview  - Ends-->
+            
+            <!-- Modal PI - Sales Price Status-  Starts-->
+            <div id="piStatusModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="gridSystemModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="gridSystemModalLabel">Sales Price Status</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-4">{!piStatus.status}!!</div>
+                                <div class="col-md-4 col-md-offset-4"> {!piStatus.message}</div>
+
+                            </div>
+                        
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
+            <!-- Modal PI - Sales Price Status-  Ends-->
+        </apex:outputPanel>
+        
+        
+        
+    </div>
+    
+
+    <!-- Modal for confirmation -  Starts-->
+    <div id="productConfirmationModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="gridSystemModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>-->
+                    <h4 class="modal-title" id="gridSystemModalLabel">Confirmation</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4">Product successfully created/updated!</div>
+                        <div class="col-md-4 col-md-offset-4"> Do you want to continue adding products?</div>
+                    </div>
+                
+                </div>
+                <div class="modal-footer">
+                    <apex:commandButton action="{!navigateToOverviewPanel}" styleClass="btn btn-default" html-data-dismiss="modal" value="No" rerender="productSearchPanel" />
+                    
+                    <apex:commandButton action="{!navigateToSearchPanel}" styleClass="btn btn-primary" html-data-dismiss="modal" value="Yes" rerender="productSearchPanel" />
+
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <!-- Modal for confirmation -  Ends-->
+    
+    </apex:form>
+    
+    </body>
+</apex:page>

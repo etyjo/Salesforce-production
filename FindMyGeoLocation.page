@@ -1,0 +1,117 @@
+<apex:page standardController="Location__c" extensions="GeoLocationController" sidebar="false">
+<apex:messages id="error" style="color:red;"/>
+<head>
+
+<!--<apex:includeScript value="{!$Resource.MapsAPI}" />-->
+<apex:includeScript value="https://maps.googleapis.com/maps/api/js?key={!$Label.APIKey_Maps}"/>
+<apex:includeScript value="{!URLFOR($Resource.Bootstrap3, '/bootstrap3/js/jquery.min.js')}"/> 
+
+<style>
+#map {
+  font-family: Arial;
+  font-size:12px;
+  line-height:normal !important;
+  height:465px;
+  // min-width:300px;
+  background:transparent;
+}
+</style>
+
+</head>
+
+        
+<body> 
+<apex:form >
+    <b><apex:outputLabel >Enter Address:       </apex:outputLabel></b>
+    <apex:inputText value="{!address1}"></apex:inputText>
+    <apex:commandButton action="{!getLatitudeLongitude}" rerender="PBSOE" value="GetGeocode" id="theButton"/>
+    <apex:commandButton action="{!Cancel}" value="Cancel" id="thebutton2"/>
+     <apex:pageBlock id="PBSOE" rendered="{!allowmap}">
+          <script>
+            function getGeolocation() {
+                        
+                          //if('{!address1}' != '' ){
+                          var map;
+                          var infowindow;
+                          var marker;
+                          var check='{!lat}';
+                          
+                          if(check!=null){
+                          var lat1='{!lat}';
+                          var lng1='{!lng}';
+                          }
+                          map = new google.maps.Map(document.getElementById('map'), {
+                            zoom: 11,
+                            center: {lat:parseFloat(lat1), lng:parseFloat(lng1)}
+                          });
+                          
+                            infowindow = new google.maps.InfoWindow({
+                            content: "<b>{!LocRecord.Name}</b><br>" + '{!address1}' + " ("+lat1 +", "+lng1+")"
+                            });
+                    
+                            //create marker
+                            marker = new google.maps.Marker({
+                                position: {lat:parseFloat(lat1), lng:parseFloat(lng1)},
+                                map: map,
+                                animation: google.maps.Animation.DROP,
+                                draggable: true,
+                                title: "{!LocRecord.Name}"
+                            });
+                    
+                            //add listeners
+                            google.maps.event.addListener(marker, 'click', function() {
+                              infowindow.open(map,marker);
+                            });
+                            google.maps.event.addListener(infowindow, 'closeclick', function() {
+                              map.setCenter(marker.getPosition()); 
+                            });
+                            
+                            
+                            google.maps.event.addListener(marker, 'dragend', function(evt){
+                                infowindow.setOptions({
+                                    content: '<p> Lat:<b>' + evt.latLng.lat() + '<br></b> Lng:<b> ' + evt.latLng.lng() + '</b></p>'
+                                });
+                                infowindow.open(map, marker);
+                                //console.log(evt.latLng.lat().toFixed(6));
+                                $(".clslat").val(evt.latLng.lat());
+                                $(".clslng").val(evt.latLng.lng());
+                            });
+                        
+                           /* google.maps.event.addListener(marker, 'drag', function(evt){
+                                console.log("marker is being dragged");
+                            });  */   
+
+                            
+                           /* }
+                           else
+                           { 
+                              alert('Address Not filled');
+                           }*/
+
+                         
+            }
+            
+                          $(document).ready(function() {
+                           console.log( "ready!" );
+                           getGeolocation();
+                          });
+                        
+          </script>
+               <apex:outputLabel >Latitude: </apex:outputLabel>
+                  <b><!--<apex:outputText id="latitude" value="{!lat}   " styleClass="clslat"></apex:outputText>--></b>
+                  <apex:inputText value="{!lat}" styleClass="clslat" onkeydown="return false;" />
+             <br></br>
+               <apex:outputLabel >Longitude: </apex:outputLabel>
+                 <b> <!--<apex:outputText id="longitude" value="{!lng}     " styleClass="clslng"></apex:outputText>--></b>
+                 <apex:inputText value="{!lng}" styleClass="clslng" onkeydown="return false;"/>
+               <apex:commandButton action="{!Updatelocation}" value="Save" id="theButton1"  />
+                    <apex:outputPanel >
+                            <div id="map">
+                            </div>
+                    </apex:outputPanel> 
+     </apex:pageBlock>
+ </apex:form>
+</body>   
+
+
+</apex:page>

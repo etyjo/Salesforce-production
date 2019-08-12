@@ -1,0 +1,80 @@
+<apex:page standardController="Market__c" extensions="AccountGroupReportController" sidebar="false" contentType="application/vnd.ms-excel#Report_{!theMarket.Name}_{!TODAY()}.xls">
+    <!--
+    <apex:form >   
+        
+        <apex:pageBlock >
+        <apex:pageblockTable value="{!listReportData}" var="RD">
+            <apex:column value="{!RD.Name}" headerValue="Account Name"/>
+            <apex:column value="{!RD.CustomerNumber }" headerValue="Account No"/>
+            <apex:column value="{!RD.CustomerDirectIndirect }" headerValue="Account Direct / Indirect"/>
+            <apex:column value="{!RD.AccountEmail }" headerValue="Account Email"/>
+            <apex:column value="{!RD.Phone}" headerValue="Phone"/>
+            <apex:column value="{!RD.Street }" headerValue="Street"/>
+            <apex:column value="{!RD.Zip}" headerValue="Zip"/>
+            <apex:column value="{!RD.City}" headerValue="City"/>
+            <apex:column value="{!RD.State}" headerValue="State"/>
+            <apex:column value="{!RD.Country}" headerValue="Country"/>
+            <apex:column value="{!RD.AccountClass}" headerValue="Account Class"/>    
+            <apex:column value="{!RD.AccountClass}" headerValue="Contact Name"/>    
+            <apex:column value="{!RD.AccountClass}" headerValue="Role"/>    
+            <apex:column value="{!RD.AccountClass}" headerValue="Phone"/>    
+            <apex:column value="{!RD.AccountClass}" headerValue="Mobile"/>    
+            <apex:column value="{!RD.AccountClass}" headerValue="Email"/>    
+            <apex:column value="{!RD.AccountClass}" headerValue="Decision Maker"/>    
+            <apex:column value="{!RD.AccountClass}" headerValue="Department"/>   
+            <apex:column value="{!RD.AccountClass}" headerValue="KOL"/>   
+            <apex:column value="{!RD.AccountClass}" headerValue="Sphere of Influence"/>        
+        </apex:pageblockTable>
+        </apex:pageBlock>
+    </apex:form>
+    -->
+    <span style="font-size:20px">Account Group Report for {!theMarket.Name}</span>
+    <table border="1">
+        <tr>
+            <th>Account Name</th>
+            <th>NumberAccount No</th>
+            <th>DirectIndirectAccount Direct / Indirect</th>
+            <th>EmailAccount Email</th>
+            <th>Phone</th>
+            <th>Street</th>
+            <th>Zip</th>
+            <th>City</th>
+            <th>State</th>
+            <th>Country</th>
+            <th>Account Class</th>    
+            <th>Contact Name</th>    
+            <th>Role</th>    
+            <th>Phone</th>    
+            <th>Mobile</th>    
+            <th>Email</th>    
+            <th>Decision Maker</th>    
+            <th>Department</th>   
+            <th>KOL</th>   
+            <th>Sphere of Influence</th> 
+        </tr>
+        <apex:repeat value="{!listReportData}" var="RD">
+            <tr>
+            <td>{!RD.Name}</td>
+            <td>{!RD.CustomerNumber }</td>
+            <td>{!RD.CustomerDirectIndirect }</td>
+            <td>{!RD.AccountEmail }</td>
+            <td>{!RD.Phone}</td>
+            <td>{!RD.Street }</td>
+            <td>{!RD.Zip}</td>
+            <td>{!RD.City}</td>
+            <td>{!RD.State}</td>
+            <td>{!RD.Country}</td>
+            <td>{!RD.AccountClass}</td>
+            <td>{!RD.ContactName}</td>
+            <td>{!RD.Role}</td>
+            <td>{!RD.ContactPhone}</td>
+            <td>{!RD.ContactMobile}</td>
+            <td>{!RD.ContactEmail}</td>
+            <td>{!RD.DecisionMaker}</td>
+            <td>{!RD.Department}</td>
+            <td>{!RD.KOL}</td>
+            <td>{!RD.SphereOfInfluence}</td>
+            </tr>
+        </apex:repeat>
+    </table>
+</apex:page>

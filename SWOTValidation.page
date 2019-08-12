@@ -1,0 +1,9 @@
+<apex:page standardController="SWOT__c" >
+    <c:accountTeamAuthorization queryStringForObject="select id, Business_Plan__c, Business_Plan__r.Account__c, Business_Plan__r.Account__r.OwnerId, Business_Plan__r.Market__c, Business_Plan__r.Market__r.OwnerId from SWOT__c" 
+                                accountFieldNameForAccount="Business_Plan__r:Account__c"
+                                objectNameForNavigation="SWOT__c"
+                                parentFieldIdId="CF00N2400000ILF1a_lkid"
+                                queryStringForOwner="select id, account__c, account__r.OwnerId, Market__c, Market__r.OwnerId from Business_Plan__c" 
+                                checkforOwnership="false" />                               
+                                                        
+</apex:page>

@@ -1,0 +1,36 @@
+<apex:page controller="MissingAccountMemberReportController" sidebar="false" contentType="application/ms-excel#Missing_Member_{!TODAY()}.xls" readOnly="true">
+        <head>
+            <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+        </head>
+        <div>
+            <span style="font-size:20px">Members Missing in Account Team or Account team (Crop Responsibility)</span>      
+        </div>
+  
+        <table border="1">
+        <tr>
+            <th>Account Owner Legal Entity</th>
+            <th>Account Owner</th>
+            <th>Account Name</th>
+            <th>Account Number</th>
+            <th>Account Team user name</th>
+            <th>Account Team last modified date</th>
+            <th>Account Team (CR) user name</th>
+            <th>Account Team (CR) last modified date</th>
+            
+        </tr>
+        <apex:repeat value="{!listReportData}" var="RD">
+        <tr>
+            <td>{!RD.Account_Owner_Legal_Entity}</td>
+            <td>{!RD.Account_Owner}</td>
+            <td>{!RD.Account_Name}</td>
+            <td>{!RD.Account_Number}</td>
+            <td>{!RD.Account_Team_User_Name}</td>
+            <td>{!RD.Account_Team_Last_Modified_Date}</td>
+            <td>{!RD.Account_Team_CR_user_name }</td>
+            <td>{!RD.Account_Team_CR_last_modified_date }</td>
+            
+         </tr>
+        </apex:repeat>
+    </table>
+  
+</apex:page>
